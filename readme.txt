@@ -4,12 +4,12 @@
 ================================================================================
 
 GROUP MEMBERS:
-- Dagatan, Tristan Kyle
-- Dobli, Ferdinand John
-- Laynes, Carlo Allan
-- Manuel, Meynard Roi
-- Niñora, Michael Andrei
-- Sintos, Tristan
+- Dagatan, Tristan Kyle 
+- Dobli, Ferdinand John - Fullstack Developer
+- Laynes, Carlo Allan - Frontend Developer, XAMPP Setup
+- Manuel, Meynard Roi  - Documentation
+- Niñora, Michael Andrei - Frontend Developer
+- Sintos, Tristan 
 
 ================================================================================
 SYSTEM OVERVIEW
