@@ -57,37 +57,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-function updateCharacterCount(textarea, maxLength = 500) {
-    const remaining = maxLength - textarea.value.length;
-    let counter = textarea.parentNode.querySelector('.char-counter');
-    
-    if (!counter) {
-        counter = document.createElement('small');
-        counter.className = 'char-counter text-muted';
-        textarea.parentNode.appendChild(counter);
-    }
-    
-    counter.textContent = `${remaining} characters remaining`;
-    
-    if (remaining < 50) {
-        counter.className = 'char-counter text-warning';
-    } else if (remaining < 0) {
-        counter.className = 'char-counter text-danger';
-    } else {
-        counter.className = 'char-counter text-muted';
-    }
-}
-
-document.addEventListener('DOMContentLoaded', function() {
-    const remarksTextarea = document.querySelector('textarea[name="event_remarks"]');
-    if (remarksTextarea) {
-        remarksTextarea.addEventListener('input', function() {
-            updateCharacterCount(this);
-        });
-        updateCharacterCount(remarksTextarea);
-    }
-});
-
 function filterEvents() {
     const searchInput = document.getElementById('eventSearch');
     const filter = searchInput.value.toLowerCase();
