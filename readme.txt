@@ -5,7 +5,7 @@
 
 GROUP MEMBERS:
 - Dagatan, Tristan Kyle - Moral Support
-- Dobli, Ferdinand John - Fullstack Developer, MAMP Setup
+- Dobli, Ferdinand John - Fullstack Developer, MAMP & Database Setup
 - Laynes, Carlo Allan - Frontend Developer, XAMPP Setup
 - Manuel, Meynard Roi  - Documentator
 - Niñora, Michael Andrei - Frontend Developer
