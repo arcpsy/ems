@@ -593,6 +593,13 @@ $result = $conn->query($query);
         </section>
     </div>
 
+
+ <!-- Add Event Modal | Laynes -->
+ <!-- Add Event Modal | Laynes -->
+ <!-- Add Event Modal | Laynes -->
+
+
+
     <div class="modal fade" id="addEventModal" tabindex="-1" aria-labelledby="addEventModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -645,6 +652,10 @@ $result = $conn->query($query);
     </div> <!-- end modal-dialog -->
 </div> <!-- end modal -->
     <!-- Modals -->
+ <!-- end modal | Laynes -->
+
+
+
     <?php 
     $result->data_seek(0); // Reset result pointer
     while($event = $result->fetch_assoc()): 
