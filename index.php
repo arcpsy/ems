@@ -2,7 +2,7 @@
 session_start();
 require_once 'config.php';
 
-$page_title = "Events Monitoring System - Home";
+$page_title = "GalaGo - Events Monitoring System - Home";
 
 $total_query = "SELECT COUNT(*) as total FROM events";
 $total_result = $conn->query($total_query);
@@ -14,40 +14,50 @@ $upcoming_result = $conn->query($upcoming_query);
 ob_start();
 ?>
 
+
 <div class="row">
     <div class="col-12">
         <div class="jumbotron bg-primary text-white p-5 rounded mb-4">
-            <h1 class="display-4">
-                <i class="bi bi-calendar-event"></i> Events Monitoring System
+           <h1 class="display-4 fw-semibold">
+                 <i class="bi bi-calendar-event"></i> Welcome to GalaGo
             </h1>
             <p class="lead">Manage and track all your company events efficiently</p>
             <hr class="my-4 bg-white">
-            <p>Keep track of event details, locations, dates, pricing and more with our comprehensive monitoring system.</p>
+            <p>Keep track of event details, locations, dates, pricing and more with GalaGo's comprehensive monitoring system.</p>
             <a class="btn btn-light btn-lg" href="events.php" role="button">
                 <i class="bi bi-eye"></i> View All Events
             </a>
+            <div class="mt-4">
+                <small class="text-black-50">
+                    Developed by
+                    <strong> Ferdinand Dobli</strong>,
+                    <strong> Tristan Dagatan</strong>,
+                    <strong> Carlo Laynes</strong>,
+                    <strong> Meynard Manuel</strong>,
+                    <strong> Andrei Niñora</strong> &
+                    <strong> Tristan Sintos</strong>
+                </small>
+            </div>
         </div>
     </div>
 </div>
 
-<div class="row">
-    <div class="col-md-6">
-        <div class="card h-100">
+<div class="row align-items-stretch">
+    <div class="col-md-6 d-flex mb-4 mb-md-0">
+        <div class="card flex-fill d-flex flex-column h-100">
             <div class="card-header bg-success text-white">
                 <h5 class="card-title mb-0">
                     <i class="bi bi-bar-chart"></i> System Overview
                 </h5>
             </div>
-            <div class="card-body">
-                <div class="row text-center">
-                    <div class="col-12">
-                        <div class="bg-light p-3 rounded mb-3">
-                            <h2 class="text-success mb-0"><?php echo $total_events; ?></h2>
-                            <p class="text-muted mb-0">Total Events</p>
-                        </div>
+            <div class="card-body d-flex flex-column">
+                <div class="flex-grow-1 d-flex flex-column justify-content-center align-items-center w-100">
+                    <div class="bg-light rounded w-100 py-5 d-flex flex-column justify-content-center align-items-center">
+                        <h2 class="text-success mb-0"><?php echo $total_events; ?></h2>
+                        <p class="text-muted mb-0">Total Events</p>
                     </div>
                 </div>
-                <div class="d-grid">
+                <div class="mt-auto d-grid">
                     <a href="events.php" class="btn btn-success">
                         <i class="bi bi-plus-circle"></i> Manage Events
                     </a>
@@ -56,16 +66,16 @@ ob_start();
         </div>
     </div>
     
-    <div class="col-md-6">
-        <div class="card h-100">
+    <div class="col-md-6 d-flex">
+        <div class="card flex-fill d-flex flex-column">
             <div class="card-header bg-info text-white">
                 <h5 class="card-title mb-0">
-                    <i class="bi bi-calendar-check"></i> Upcoming Events
+                    <i class="bi bi-megaphone-fill"></i> Upcoming Events
                 </h5>
             </div>
-            <div class="card-body">
+            <div class="card-body d-flex flex-column">
                 <?php if ($upcoming_result->num_rows > 0): ?>
-                    <div class="list-group list-group-flush">
+                    <div class="list-group list-group-flush flex-grow-1 overflow-auto" style="max-height: 300px;">
                         <?php while($event = $upcoming_result->fetch_assoc()): ?>
                             <div class="list-group-item px-0 py-2">
                                 <h6 class="mb-1"><?php echo htmlspecialchars($event['event_name']); ?></h6>
@@ -78,7 +88,7 @@ ob_start();
                         <?php endwhile; ?>
                     </div>
                 <?php else: ?>
-                    <div class="text-center text-muted">
+                    <div class="text-center text-muted flex-grow-1">
                         <i class="bi bi-calendar-x display-4"></i>
                         <p>No upcoming events scheduled</p>
                     </div>
@@ -91,7 +101,7 @@ ob_start();
 <div class="row mt-4">
     <div class="col-12">
         <div class="card">
-            <div class="card-header bg-warning text-dark">
+            <div class="card-header text-white" style="background-color: #6a2fe4;">
                 <h5 class="card-title mb-0">
                     <i class="bi bi-info-circle"></i> System Features
                 </h5>
