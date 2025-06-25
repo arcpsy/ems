@@ -1,4 +1,5 @@
 <?php
+// Update these constants with your database credentials
 define('DB_HOST', 'localhost');
 define('DB_USERNAME', 'root');
 define('DB_PASSWORD', '');
@@ -16,8 +17,8 @@ function sanitize_input($data) {
     global $conn;
     $data = trim($data);
     $data = stripslashes($data);
-    $data = htmlspecialchars($data);
-    return mysqli_real_escape_string($conn, $data);
+    $data = htmlspecialchars($data); // Prevents XSS.
+    return mysqli_real_escape_string($conn, $data); // Prevents SQL injection.
 }
 
 function validate_date($date, $format = 'Y-m-d') {
