@@ -2,7 +2,7 @@
 // Make sure you have:
 
 session_start();
-require_once 'config.php';
+require_once 'config/config.php';
 
 // Handle form submission for adding new event
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_event'])) {

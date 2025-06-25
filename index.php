@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once 'config.php';
+require_once 'config/config.php';
 
 $page_title = "GalaGo - Events Monitoring System - Home";
 
