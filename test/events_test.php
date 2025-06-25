@@ -2,14 +2,19 @@
 session_start();
 require_once __DIR__ . '/../config/config.php';
 
-// Handle delete BEFORE fetch
+$successMessage = $_SESSION['successMessage'] ?? '';
+$errorMessage = $_SESSION['errorMessage'] ?? '';
+unset($_SESSION['successMessage'], $_SESSION['errorMessage']);
+
+// Handle delete
 if (isset($_GET['delete']) && is_numeric($_GET['delete'])) {
     $event_id = (int)$_GET['delete'];
     $stmt = $conn->prepare("DELETE FROM events WHERE id = ?");
     $stmt->bind_param("i", $event_id);
 
     if ($stmt->execute()) {
-        echo "<script>alert('Event deleted successfully!'); window.location.href='events_test.php';</script>";
+        $_SESSION['successMessage'] = 'Event deleted successfully!';
+        header('Location: events_test.php');
         exit;
     } else {
         echo "<script>alert('Error deleting event!');</script>";
@@ -64,23 +69,23 @@ $result = $conn->query("SELECT * FROM events ORDER BY event_date DESC");
 
     <div class="container mt-4">
 
+        <div class="alert alert-success">
+            <h2><i class="bi bi-check-circle"></i> SUCCESS! This is the EVENTS page, not the homepage!</h2>
+            <p>URL: <?php echo $_SERVER['REQUEST_URI']; ?></p>
+            <p>File: <?php echo __FILE__; ?></p>
+        </div>
+
         <!-- 🚧 TEST MODE BANNER -->
         <div class="alert alert-warning text-center">
             <strong>TEST PAGE:</strong> This page is for testing layout and behavior only.
         </div>
 
-        <!-- ✅ Status Messages -->
+        <!-- Status Messages -->
         <?php if (!empty($successMessage)): ?>
             <div class="alert alert-success"><?php echo $successMessage; ?></div>
-        <?php elseif (!empty($errorMessage)): ?>
-            <div class="alert alert-danger"><?php echo $errorMessage; ?></div>
+            <?php elseif (!empty($errorMessage)): ?>
+                <div class="alert alert-danger"><?php echo $errorMessage; ?></div>
         <?php endif; ?>
-
-        <div class="alert alert-success">
-            <h1><i class="bi bi-check-circle"></i> SUCCESS! This is the EVENTS page, not the homepage!</h1>
-            <p>URL: <?php echo $_SERVER['REQUEST_URI']; ?></p>
-            <p>File: <?php echo __FILE__; ?></p>
-        </div>
 
         <!-- ➕ Add Event -->
         <div class="card mb-4">
@@ -174,6 +179,7 @@ $result = $conn->query("SELECT * FROM events ORDER BY event_date DESC");
                 <?php endif; ?>
             </div>
         </div>
+
     </div>
 </body>
 </html>
