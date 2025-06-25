@@ -1,6 +1,9 @@
 # Use the official PHP image with Apache
 FROM php:8.2-apache
 
+# Update package list and install dependencies for PHP extensions
+RUN apt-get update && apt-get install -y libpng-dev libjpeg-dev libfreetype6-dev
+
 # Install the mysqli extension
 RUN docker-php-ext-install mysqli
 
