@@ -4,12 +4,12 @@
 ================================================================================
 
 GROUP MEMBERS:
-- Dagatan, Tristan Kyle - Moral Support
-- Dobli, Ferdinand John - Fullstack Developer, MAMP & Database Setup
-- Laynes, Carlo Allan - Frontend Developer, XAMPP Setup
-- Manuel, Meynard Roi  - Documentator
-- Niñora, Michael Andrei - Frontend Developer
-- Sintos, Tristan - The Questioner
+- Dagatan, Tristan Kyle 
+- Dobli, Ferdinand John
+- Laynes, Carlo Allan 
+- Manuel, Meynard Roi  
+- Niñora, Michael Andrei 
+- Sintos, Tristan 
 
 ================================================================================
 SYSTEM OVERVIEW
@@ -65,6 +65,7 @@ INSTALLATION INSTRUCTIONS
      │   └── script.js
      ├── templates/
      │   └── base.html
+     │   └── events.php
      ├── config.php
      ├── index.php
      ├── events.php
@@ -77,7 +78,7 @@ INSTALLATION INSTRUCTIONS
    • Set appropriate file permissions (644 for files, 755 for directories)
 
 4. TESTING:
-   • Navigate to http://localhost/events_monitoring/ in your browser
+   • Navigate to http://localhost/index.php/ in your browser
    • Verify database connection and basic functionality
 
 ================================================================================
@@ -86,7 +87,7 @@ HOW TO USE THE SYSTEM
 
 1. ACCESSING THE SYSTEM:
    • Open your web browser
-   • Navigate to the system URL (http://localhost/events_monitoring/)
+   • Navigate to the system URL (http://localhost/index.php/)
    • The homepage displays system overview and quick stats
 
 2. VIEWING EVENTS:
@@ -274,6 +275,6 @@ PROJECT COMPLETION CHECKLIST
 END OF DOCUMENTATION
 ================================================================================
 
-Last Updated: June 23, 2025
+Last Updated: June 25, 2025
 System Version: 1.0
 Documentation Version: 1.0
