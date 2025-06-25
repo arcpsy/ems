@@ -665,3 +665,87 @@ footer {
 .modal.show .modal-dialog {
     transform: none;
 }
+
+/* Make form and preview readable */
+.edit-header,
+.edit-form-container,
+.preview-card {
+    background: #fff !important;
+    color: #181818 !important;
+    border: 1px solid #e0e0e0 !important;
+    box-shadow: 0 4px 24px rgba(60,72,88,0.08);
+}
+
+.edit-header h1,
+.edit-header p,
+.edit-header .badge,
+.edit-form-container label,
+.edit-form-container .invalid-feedback,
+.preview-card h5,
+.preview-label,
+.preview-value,
+.character-counter,
+.text-white,
+.text-white.opacity-75,
+.text-white.opacity-50 {
+    color: #181818 !important;
+    opacity: 1 !important;
+}
+
+.edit-form-container .form-control {
+    background: #f8f9fa !important;
+    color: #181818 !important;
+    border: 1.5px solid #d1d5db !important;
+}
+
+.edit-form-container .form-control:focus {
+    background: #fff !important;
+    border-color: #6a2fe4 !important;
+    color: #181818 !important;
+}
+
+.preview-card {
+    background: #f8f9fa !important;
+    color: #181818 !important;
+}
+
+.preview-icon {
+    background: #6a2fe4 !important;
+    color: #fff !important;
+}
+
+.btn-group-enhanced .btn {
+    color: #fff;
+}
+
+.btn-group-enhanced .btn-secondary {
+    background: #444 !important;
+    border: none !important;
+}
+
+.btn-group-enhanced .btn-info {
+    background: #00bcd4 !important;
+    border: none !important;
+}
+
+.breadcrumb-enhanced {
+    background: #fff !important;
+    color: #181818 !important;
+    border: 1px solid #e0e0e0 !important;
+}
+
+/* Make breadcrumbs visible and accessible */
+.breadcrumb-enhanced .breadcrumb-item a {
+    color: #222 !important;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+.breadcrumb-enhanced .breadcrumb-item a:hover {
+    color: #6a2fe4 !important;
+    text-shadow: 0 0 10px rgba(106, 47, 228, 0.15);
+}
+.breadcrumb-enhanced .breadcrumb-item.active {
+    color: #181818 !important;
+    font-weight: 600;
+}
