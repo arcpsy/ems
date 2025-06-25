@@ -96,9 +96,10 @@ $result = $conn->query($query);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Events Management</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.0/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/bootstrap-icons.min.css">
     <link href="css/style.css" rel="stylesheet">
+    <script defer src="../js/bootstrap.bundle.min.js"></script>
     <style>
         /* Card View Styles */
         .event-card {
@@ -637,13 +638,6 @@ $result = $conn->query($query);
         </section>
     </div>
 
-
- <!-- Add Event Modal | Laynes -->
- <!-- Add Event Modal | Laynes -->
- <!-- Add Event Modal | Laynes -->
-
-
-
     <div class="modal fade" id="addEventModal" tabindex="-1" aria-labelledby="addEventModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -811,7 +805,6 @@ $result = $conn->query($query);
         </div>
     </footer>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     <script src="js/script.js"></script>
     <script>
         function toggleView(viewType) {

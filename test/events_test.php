@@ -52,7 +52,7 @@ $result = $conn->query("SELECT * FROM events ORDER BY event_date DESC");
     <title>Events Page Test</title>
     <link rel="stylesheet" href="../css/bootstrap.min.css">
     <link rel="stylesheet" href="../css/bootstrap-icons.min.css">
-    <script src="../js/bootstrap.bundle.min.js"></script>
+    <script defer src="../js/bootstrap.bundle.min.js"></script>
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-danger">
