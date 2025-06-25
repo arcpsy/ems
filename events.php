@@ -1,33 +1,84 @@
 <?php
-// Make sure you have:
-
 session_start();
 require_once 'config.php';
 
-// Handle form submission for adding new event
+if (!$conn) {
+    die("Database connection failed!");
+}
+
+$tableCheck = $conn->query("SHOW TABLES LIKE 'events'");
+if ($tableCheck->num_rows == 0) {
+    die("Events table does not exist! Please run the database.sql file first.");
+}
+
+if (!function_exists('sanitize_input')) {
+    function sanitize_input($data) {
+        global $conn;
+        $data = trim($data);
+        $data = stripslashes($data);
+        $data = htmlspecialchars($data);
+        return mysqli_real_escape_string($conn, $data);
+    }
+}
+
+if (!function_exists('validate_date')) {
+    function validate_date($date, $format = 'Y-m-d') {
+        $d = DateTime::createFromFormat($format, $date);
+        return $d && $d->format($format) === $date;
+    }
+}
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_event'])) {
-    $event_name = mysqli_real_escape_string($conn, $_POST['event_name']);
-    $event_location = mysqli_real_escape_string($conn, $_POST['event_location']);
-    $event_date = mysqli_real_escape_string($conn, $_POST['event_date']);
-    $event_remarks = mysqli_real_escape_string($conn, $_POST['event_remarks']);
+    error_log("POST request received for add_event");
+    error_log("POST data: " . print_r($_POST, true));
+    
+    $event_name = sanitize_input($_POST['event_name']);
+    $event_location = sanitize_input($_POST['event_location']);
+    $event_date = sanitize_input($_POST['event_date']);
+    $event_remarks = isset($_POST['event_remarks']) ? sanitize_input($_POST['event_remarks']) : '';
     $pricing = (float)$_POST['pricing'];
     
-    if (!empty($event_name) && !empty($event_location) && !empty($event_date) && $pricing >= 0) {
+    $errors = [];
+    
+    if (empty($event_name)) {
+        $errors[] = "Event name is required";
+    }
+    
+    if (empty($event_location)) {
+        $errors[] = "Event location is required";
+    }
+    
+    if (empty($event_date)) {
+        $errors[] = "Event date is required";
+    } elseif (!validate_date($event_date)) {
+        $errors[] = "Invalid date format";
+    }
+    
+    if (empty($pricing) || !is_numeric($pricing) || $pricing < 0) {
+        $errors[] = "Valid pricing is required";
+    }
+    
+    if (empty($errors)) {
         $stmt = $conn->prepare("INSERT INTO events (event_name, event_location, event_date, event_remarks, pricing) VALUES (?, ?, ?, ?, ?)");
         $stmt->bind_param("ssssd", $event_name, $event_location, $event_date, $event_remarks, $pricing);
         
         if ($stmt->execute()) {
             $_SESSION['success'] = "Event added successfully!";
+            error_log("Event added successfully: " . $event_name);
         } else {
-            $_SESSION['error'] = "Error adding event";
+            $_SESSION['error'] = "Error adding event: " . $conn->error;
+            error_log("Error adding event: " . $conn->error);
         }
         $stmt->close();
-        header("Location: events.php");
-        exit();
+    } else {
+        $_SESSION['error'] = implode(", ", $errors);
+        error_log("Validation errors: " . implode(", ", $errors));
     }
+    
+    header("Location: events.php");
+    exit();
 }
 
-// Handle delete request
 if (isset($_POST['delete_event']) && is_numeric($_POST['event_id'])) {
     $event_id = (int)$_POST['event_id'];
     $stmt = $conn->prepare("DELETE FROM events WHERE id = ?");
@@ -43,50 +94,6 @@ if (isset($_POST['delete_event']) && is_numeric($_POST['event_id'])) {
     exit();
 }
 
-// Fetch all events
-$query = "SELECT * FROM events ORDER BY event_date DESC";
-$result = $conn->query($query);
-
-// Handle form submission for adding new event
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_event'])) {
-    $event_name = mysqli_real_escape_string($conn, $_POST['event_name']);
-    $event_location = mysqli_real_escape_string($conn, $_POST['event_location']);
-    $event_date = mysqli_real_escape_string($conn, $_POST['event_date']);
-    $event_remarks = mysqli_real_escape_string($conn, $_POST['event_remarks']);
-    $pricing = (float)$_POST['pricing'];
-    
-    if (!empty($event_name) && !empty($event_location) && !empty($event_date) && $pricing >= 0) {
-        $stmt = $conn->prepare("INSERT INTO events (event_name, event_location, event_date, event_remarks, pricing) VALUES (?, ?, ?, ?, ?)");
-        $stmt->bind_param("ssssd", $event_name, $event_location, $event_date, $event_remarks, $pricing);
-        
-        if ($stmt->execute()) {
-            $_SESSION['success'] = "Event added successfully!";
-        } else {
-            $_SESSION['error'] = "Error adding event";
-        }
-        $stmt->close();
-        header("Location: events.php");
-        exit();
-    }
-}
-
-// Handle delete request
-if (isset($_POST['delete_event']) && is_numeric($_POST['event_id'])) {
-    $event_id = (int)$_POST['event_id'];
-    $stmt = $conn->prepare("DELETE FROM events WHERE id = ?");
-    $stmt->bind_param("i", $event_id);
-    
-    if ($stmt->execute()) {
-        $_SESSION['success'] = "Event deleted successfully!";
-    } else {
-        $_SESSION['error'] = "Error deleting event";
-    }
-    $stmt->close();
-    header("Location: events.php");
-    exit();
-}
-
-// Fetch all events
 $query = "SELECT * FROM events ORDER BY event_date DESC";
 $result = $conn->query($query);
 ?>
@@ -95,279 +102,271 @@ $result = $conn->query($query);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Events Management</title>
+    <title>Events Management - GalaGo</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.0/font/bootstrap-icons.min.css" rel="stylesheet">
     <link href="css/style.css" rel="stylesheet">
     <style>
-        /* Card View Styles */
-        .event-card {
-            transition: all 0.3s ease;
-            border: none;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        .debug-info {
+            background: rgba(255, 0, 0, 0.1);
+            border: 1px solid rgba(255, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+            color: white;
+            font-family: monospace;
+            font-size: 0.9rem;
         }
-        .event-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-        }
-        .event-status-past { border-left: 4px solid #6c757d; }
-        .event-status-today { border-left: 4px solid #ffc107; }
-        .event-status-upcoming { border-left: 4px solid #198754; }
-        .pricing-badge {
-            font-size: 1.2rem;
-            font-weight: 600;
-        }
-        .event-date-large {
-            font-size: 2rem;
-            font-weight: bold;
-            line-height: 1;
-        }
-        .event-month {
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            font-weight: 600;
-        }
-
-        /* List View Styles */
-        .list-view {
-            display: none;
-        }
-        .list-view.active {
-            display: block;
-        }
-        .grid-view.active {
-            display: block;
-        }
-        .grid-view {
-            display: none;
-        }
-
-        .event-list-item {
-            background: linear-gradient(135deg, #fff 0%, #black 100%);
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            border: 1px solid rgba(0,0,0,0.05);
+        
+        .page-header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 24px;
+            padding: 2rem;
+            margin-bottom: 2rem;
             position: relative;
             overflow: hidden;
         }
 
-        .event-list-item:hover {
-            transform: translateX(10px);
-            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
-        }
-
-        .event-list-item::before {
+        .page-header::before {
             content: '';
             position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 6px;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(79, 172, 254, 0.1) 0%, transparent 70%);
+            animation: rotate 15s linear infinite;
+        }
+
+        .stats-counter {
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 4px 8px rgba(79, 172, 254, 0.3);
+        }
+
+        .floating-stats {
+            position: fixed;
+            top: 50%;
+            left: 2rem;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            padding: 1rem;
+            z-index: 1000;
             transition: all 0.3s ease;
         }
 
-        .event-list-item.status-upcoming::before {
-            background: linear-gradient(180deg, #28a745 0%, #20c997 100%);
-        }
-        .event-list-item.status-today::before {
-            background: linear-gradient(180deg, #ffc107 0%, #fd7e14 100%);
-        }
-        .event-list-item.status-past::before {
-            background: linear-gradient(180deg, #6c757d 0%, #495057 100%);
+        .floating-stats:hover {
+            transform: translateY(-50%) scale(1.05);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
         }
 
-        .event-date-circle {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
+        .event-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            padding: 1rem 0;
+        }
+
+        .event-card {
+            height: auto;
+            min-height: 400px;
+        }
+
+        .event-card .card-body {
+            padding: 2rem;
+            height: 100%;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
+        }
+
+        .event-card .d-flex.gap-2 {
+            margin-top: auto;
+        }
+
+        .pricing-badge {
+            background: var(--success-gradient);
             color: white;
-            position: relative;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        }
-
-        .event-date-circle.upcoming {
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-        }
-        .event-date-circle.today {
-            background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
-        }
-        .event-date-circle.past {
-            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
-        }
-
-        .event-date-day {
-            font-size: 1.8rem;
-            line-height: 1;
-        }
-        .event-date-month {
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            opacity: 0.9;
-        }
-
-        .event-content {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .event-title {
-            font-size: 1.4rem;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-full);
             font-weight: 700;
-            color: #2c3e50;
-            margin-bottom: 0.5rem;
-            line-height: 1.2;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 15px rgba(79, 172, 254, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: inline-block;
         }
 
-        .event-meta {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1rem;
-            margin-bottom: 0.75rem;
+        .no-events-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 24px;
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+            margin: 2rem 0;
+            backdrop-filter: blur(20px);
         }
 
-        .event-meta-item {
-            display: flex;
-            align-items: center;
-            gap: 0.4rem;
-            color: #6c757d;
-            font-size: 0.9rem;
+        .no-events-state i {
+            font-size: 4rem;
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+            display: block;
         }
 
-        .event-meta-item i {
-            color: #007bff;
-            width: 16px;
-        }
-
-        .event-description {
-            color: #6c757d;
-            font-size: 0.9rem;
-            line-height: 1.4;
+        .no-events-state h4 {
+            color: white;
             margin-bottom: 1rem;
         }
 
-        .event-actions {
-            display: flex;
-            gap: 0.5rem;
-            flex-wrap: wrap;
+        .no-events-state p {
+            color: rgba(255, 255, 255, 0.75);
+            margin-bottom: 2rem;
         }
 
-        .price-tag {
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        .search-box {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50px;
+            padding: 0.75rem 1.5rem;
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto 2rem;
             color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 25px;
-            font-weight: 600;
-            font-size: 1.1rem;
-            box-shadow: 0 2px 10px rgba(40, 167, 69, 0.3);
-            white-space: nowrap;
-        }
-
-        .status-badge {
-            position: absolute;
-            top: 1rem;
-            right: 1rem;
-            padding: 0.3rem 0.8rem;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .status-badge.upcoming {
-            background: rgba(40, 167, 69, 0.1);
-            color: #28a745;
-            border: 1px solid rgba(40, 167, 69, 0.2);
-        }
-        .status-badge.today {
-            background: rgba(255, 193, 7, 0.1);
-            color: #ffc107;
-            border: 1px solid rgba(255, 193, 7, 0.2);
-        }
-        .status-badge.past {
-            background: rgba(108, 117, 125, 0.1);
-            color: #6c757d;
-            border: 1px solid rgba(108, 117, 125, 0.2);
-        }
-
-        .view-toggle {
-            background: white;
-            border: 2px solid #007bff;
-            border-radius: 10px;
-            overflow: hidden;
-        }
-
-        .view-toggle .btn {
-            border: none;
-            border-radius: 0;
-            background: transparent;
-            color: #007bff;
             transition: all 0.3s ease;
         }
 
-        .view-toggle .btn.active {
-            background: #007bff;
+        .search-box:focus {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(79, 172, 254, 0.8);
+            box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.2);
+            transform: scale(1.02);
+        }
+
+        .search-box::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .add-event-fab {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            border: none;
             color: white;
+            font-size: 1.5rem;
+            box-shadow: 0 8px 25px rgba(79, 172, 254, 0.4);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1000;
+            cursor: pointer;
         }
 
-        .view-toggle .btn:hover {
-            background: rgba(0, 123, 255, 0.1);
+        .add-event-fab:hover {
+            transform: scale(1.15) translateY(-5px);
+            box-shadow: 0 15px 35px rgba(79, 172, 254, 0.6);
+            animation: pulse 1s ease-in-out infinite;
         }
 
-        .view-toggle .btn.active:hover {
-            background: #0056b3;
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(79, 172, 254, 0.7); }
+            70% { box-shadow: 0 0 0 20px rgba(79, 172, 254, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(79, 172, 254, 0); }
+        }
+
+        .loading-skeleton {
+            background: linear-gradient(90deg, rgba(255,255,255,0.1) 25%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0.1) 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+            border-radius: 8px;
+            height: 1rem;
+            margin: 0.5rem 0;
+        }
+
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        .event-category-tags {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+
+        .category-tag {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 0.25rem 0.75rem;
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.8);
+            transition: all 0.3s ease;
+        }
+
+        .category-tag:hover {
+            background: rgba(79, 172, 254, 0.2);
+            border-color: rgba(79, 172, 254, 0.4);
+            transform: scale(1.05);
+        }
+
+        .success-notification {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(79, 172, 254, 0.4);
+            z-index: 1100;
+            transform: translateX(400px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .success-notification.show {
+            transform: translateX(0);
         }
 
         @media (max-width: 768px) {
-            .event-list-item {
-                flex-direction: column;
-                text-align: center;
+            .floating-stats {
+                display: none;
             }
             
-            .event-date-circle {
-                width: 60px;
-                height: 60px;
-                margin-bottom: 1rem;
+            .event-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
             }
             
-            .event-date-day {
-                font-size: 1.4rem;
+            .add-event-fab {
+                bottom: 1rem;
+                right: 1rem;
+                width: 50px;
+                height: 50px;
+                font-size: 1.2rem;
             }
-            
-            .status-badge {
-                position: static;
-                margin-bottom: 1rem;
-            }
-        }
-
-        /* Character Counter Styles */
-        #charCounter {
-            font-size: 0.875rem;
-            font-weight: 500;
-            transition: color 0.3s ease;
-        }
-        
-        #charCounter.text-warning {
-            color: #fd7e14 !important;
-            font-weight: 600;
-        }
-        
-        #charCounter.text-muted {
-            color: #6c757d !important;
         }
     </style>
 </head>
-<body class="d-flex flex-column min-vh-100">
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container">
-            <a class="navbar-brand" href="index.php">
+            <a class="navbar-brand animate-fade-in" href="index.php">
                 <i class="bi bi-collection"></i> GalaGo Events
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -390,42 +389,61 @@ $result = $conn->query($query);
         </div>
     </nav>
 
-    <div class="container mt-4 flex-grow-1">
-        <!-- Success/Error Messages -->
+    <div class="floating-stats d-none d-lg-block">
+        <div class="text-center">
+            <div class="stats-counter"><?php echo $result->num_rows; ?></div>
+            <small class="text-white opacity-75">Total Events</small>
+        </div>
+    </div>
+
+    <div class="container mt-4 animate-slide-up">
         <?php if (isset($_SESSION['success'])): ?>
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <div class="alert alert-success alert-dismissible fade show animate-bounce" role="alert">
                 <i class="bi bi-check-circle"></i> <?php echo $_SESSION['success']; unset($_SESSION['success']); ?>
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
         <?php endif; ?>
 
         <?php if (isset($_SESSION['error'])): ?>
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <div class="alert alert-danger alert-dismissible fade show animate-bounce" role="alert">
                 <i class="bi bi-exclamation-triangle"></i> <?php echo $_SESSION['error']; unset($_SESSION['error']); ?>
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
         <?php endif; ?>
 
-       <h1 class="mb-4">
-            <i class="bi bi-clipboard-data" style="color: #818589;"></i> Events Management
-        </h1>
+        <div class="debug-info">
+            <strong>Debug Info:</strong><br>
+            Database Connection: <?php echo $conn ? "✅ Connected" : "❌ Failed"; ?><br>
+            Total Events in DB: <?php echo $result->num_rows; ?><br>
+            POST Method: <?php echo $_SERVER['REQUEST_METHOD']; ?><br>
+            POST Data: <?php echo !empty($_POST) ? "Present" : "None"; ?><br>
+            <?php if (!empty($_POST)): ?>
+                POST Keys: <?php echo implode(', ', array_keys($_POST)); ?><br>
+            <?php endif; ?>
+            Session Success: <?php echo isset($_SESSION['success']) ? $_SESSION['success'] : "None"; ?><br>
+            Session Error: <?php echo isset($_SESSION['error']) ? $_SESSION['error'] : "None"; ?>
+        </div>
 
-        <!-- Add Event Button -->
-        <section id="add-event-section" class="mb-4">
-            <div class="d-flex justify-content-end">
-                <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addEventModal">
-                    <i class="bi bi-plus-circle"></i> Add Event
-                </button>
+        <div class="page-header animate-fade-in">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="mb-2 text-white">
+                        <i class="bi bi-clipboard-data"></i> Events Management
+                    </h1>
+                    <p class="text-white opacity-75 mb-0">Manage and track all your company events efficiently</p>
+                </div>
+                <div class="col-md-4 text-md-end">
+                    <div class="stats-counter"><?php echo $result->num_rows; ?></div>
+                    <small class="text-white opacity-75">Events Tracked</small>
+                </div>
             </div>
-        </section>
+        </div>
 
-        <!-- Events Section -->
-        <section>
-            <!-- Events Header -->
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h3 class="mb-0">
-                    <i class="bi bi-calendar-check text-dark"></i> All Events (<?php echo $result->num_rows; ?>)
-                </h3>
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <input type="text" class="search-box" placeholder="🔍 Search events..." id="eventSearch" onkeyup="filterEvents()">
+            </div>
+            <div class="col-md-6 d-flex justify-content-end align-items-center gap-3">
                 <div class="view-toggle btn-group" role="group">
                     <button type="button" class="btn active" id="gridBtn" onclick="toggleView('grid')">
                         <i class="bi bi-grid-3x3-gap"></i> Grid
@@ -434,14 +452,17 @@ $result = $conn->query($query);
                         <i class="bi bi-list-ul"></i> List
                     </button>
                 </div>
+                <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addEventModal">
+                    <i class="bi bi-plus-circle"></i> Add Event
+                </button>
             </div>
+        </div>
 
+        <section>
             <?php if ($result->num_rows > 0): ?>
-                <!-- Grid View (Cards) -->
-                <div class="grid-view active" id="gridView">
-                    <div class="row">
+                <div class="grid-view active animate-fade-in" id="gridView">
+                    <div class="event-grid">
                         <?php while($event = $result->fetch_assoc()): 
-                            // Determine event status
                             $event_timestamp = strtotime($event['event_date']);
                             $today_timestamp = strtotime('today');
                             
@@ -462,73 +483,69 @@ $result = $conn->query($query);
                                 $status_text = 'Upcoming';
                             }
                         ?>
-                        <div class="col-lg-6 col-xl-4 mb-4">
-                            <div class="card event-card <?php echo $status_class; ?>">
-                                <div class="card-body">
-                                    <!-- Event Date Display -->
-                                    <div class="d-flex justify-content-between align-items-start mb-3">
-                                        <div class="text-center">
-                                            <div class="event-date-large text-primary">
-                                                <?php echo date('d', strtotime($event['event_date'])); ?>
-                                            </div>
-                                            <div class="event-month text-muted">
-                                                <?php echo date('M Y', strtotime($event['event_date'])); ?>
-                                            </div>
+                        <div class="card event-card <?php echo $status_class; ?> animate-fade-in">
+                            <div class="card-body position-relative">
+                                <span class="badge <?php echo $status_badge; ?> position-absolute" style="top: 1rem; right: 1rem; z-index: 10;">
+                                    <?php echo $status_text; ?>
+                                </span>
+
+                                <div class="d-flex justify-content-between align-items-start mb-3" style="padding-top: 0.5rem;">
+                                    <div class="text-center">
+                                        <div class="event-date-large text-white" style="font-size: 2.5rem; font-weight: 800;">
+                                            <?php echo date('d', strtotime($event['event_date'])); ?>
                                         </div>
-                                        <span class="badge <?php echo $status_badge; ?> fs-6">
-                                            <?php echo $status_text; ?>
-                                        </span>
+                                        <div class="event-month text-white opacity-75" style="font-size: 0.9rem; font-weight: 600;">
+                                            <?php echo date('M Y', strtotime($event['event_date'])); ?>
+                                        </div>
                                     </div>
+                                    <div class="pricing-badge">
+                                        ₱<?php echo number_format($event['pricing'], 2); ?>
+                                    </div>
+                                </div>
 
-                                    <!-- Event Details -->
-                                    <h5 class="card-title text-dark mb-2">
-                                        <?php echo htmlspecialchars($event['event_name']); ?>
-                                    </h5>
-                                    
-                                    <div class="mb-2">
-                                        <i class="bi bi-geo-alt text-primary"></i>
-                                        <span class="text-muted"><?php echo htmlspecialchars($event['event_location']); ?></span>
-                                    </div>
+                                <h5 class="event-title">
+                                    <?php echo htmlspecialchars($event['event_name']); ?>
+                                </h5>
+                                
+                                <div class="event-meta-item mb-2">
+                                    <i class="bi bi-geo-alt"></i>
+                                    <span><?php echo htmlspecialchars($event['event_location']); ?></span>
+                                </div>
 
-                                    <div class="mb-3">
-                                        <i class="bi bi-calendar text-info"></i>
-                                        <span class="text-muted"><?php echo date('l, F d, Y', strtotime($event['event_date'])); ?></span>
-                                    </div>
+                                <div class="event-meta-item mb-3">
+                                    <i class="bi bi-calendar"></i>
+                                    <span><?php echo date('l, F d, Y', strtotime($event['event_date'])); ?></span>
+                                </div>
 
-                                    <?php if (!empty($event['event_remarks'])): ?>
-                                    <div class="mb-3">
-                                        <small class="text-muted">
-                                            <i class="bi bi-chat-text"></i>
-                                            <?php echo htmlspecialchars(substr($event['event_remarks'], 0, 80)); ?>
-                                            <?php echo strlen($event['event_remarks']) > 80 ? '...' : ''; ?>
-                                        </small>
-                                    </div>
-                                    <?php endif; ?>
+                                <?php if (!empty($event['event_remarks'])): ?>
+                                <div class="mb-3">
+                                    <small class="text-white opacity-75">
+                                        <i class="bi bi-chat-text"></i>
+                                        <?php echo htmlspecialchars(substr($event['event_remarks'], 0, 80)); ?>
+                                        <?php echo strlen($event['event_remarks']) > 80 ? '...' : ''; ?>
+                                    </small>
+                                </div>
+                                <?php endif; ?>
 
-                                    <!-- Pricing -->
-                                    <div class="d-flex justify-content-between align-items-center mb-3">
-                                        <span class="pricing-badge text-success">
-                                            ₱<?php echo number_format($event['pricing'], 2); ?>
-                                        </span>
-                                        <small class="text-muted">
-                                            Added: <?php echo date('M d', strtotime($event['date_added'])); ?>
-                                        </small>
-                                    </div>
+                                <div class="event-category-tags mb-3">
+                                    <span class="category-tag"><?php echo ucfirst($status); ?></span>
+                                    <span class="category-tag">
+                                        <?php echo $event['pricing'] > 1000 ? 'Premium' : 'Standard'; ?>
+                                    </span>
+                                </div>
 
-                                    <!-- Action Buttons -->
-                                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                                        <button type="button" class="btn btn-outline-info btn-sm" 
-                                                data-bs-toggle="modal" data-bs-target="#viewModal<?php echo $event['id']; ?>">
-                                            <i class="bi bi-eye"></i> View
-                                        </button>
-                                        <a href="edit_event.php?id=<?php echo $event['id']; ?>" class="btn btn-outline-primary btn-sm">
-                                            <i class="bi bi-pencil"></i> Edit
-                                        </a>
-                                        <button type="button" class="btn btn-outline-danger btn-sm" 
-                                                data-bs-toggle="modal" data-bs-target="#deleteModal<?php echo $event['id']; ?>">
-                                            <i class="bi bi-trash"></i> Delete
-                                        </button>
-                                    </div>
+                                <div class="d-flex gap-2">
+                                    <button type="button" class="btn btn-outline-info btn-sm flex-fill" 
+                                            data-bs-toggle="modal" data-bs-target="#viewModal<?php echo $event['id']; ?>">
+                                        <i class="bi bi-eye"></i> View
+                                    </button>
+                                    <a href="edit_event.php?id=<?php echo $event['id']; ?>" class="btn btn-outline-primary btn-sm flex-fill">
+                                        <i class="bi bi-pencil"></i> Edit
+                                    </a>
+                                    <button type="button" class="btn btn-outline-danger btn-sm flex-fill" 
+                                            data-bs-toggle="modal" data-bs-target="#deleteModal<?php echo $event['id']; ?>">
+                                        <i class="bi bi-trash"></i> Delete
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -536,14 +553,12 @@ $result = $conn->query($query);
                     </div>
                 </div>
 
-                <!-- List View -->
                 <div class="list-view" id="listView">
                     <div class="row">
                         <div class="col-12">
                             <?php 
-                            $result->data_seek(0); // Reset result pointer
+                            $result->data_seek(0); 
                             while($event = $result->fetch_assoc()): 
-                                // Determine event status
                                 $event_timestamp = strtotime($event['event_date']);
                                 $today_timestamp = strtotime('today');
                                 
@@ -564,23 +579,20 @@ $result = $conn->query($query);
                                     $status_text = 'Upcoming';
                                 }
                             ?>
-                            <div class="event-list-item status-<?php echo $status; ?> p-4 mb-4 d-flex align-items-center position-relative">
-                                <!-- Status Badge -->
+                            <div class="event-list-item status-<?php echo $status; ?> p-4 mb-4 d-flex align-items-center position-relative animate-slide-up">
                                 <div class="status-badge <?php echo $badge_class; ?>">
                                     <?php echo $status_text; ?>
                                 </div>
 
-                                <!-- Date Circle -->
                                 <div class="event-date-circle <?php echo $circle_class; ?> me-4 flex-shrink-0">
                                     <div class="event-date-day"><?php echo date('d', strtotime($event['event_date'])); ?></div>
                                     <div class="event-date-month"><?php echo date('M', strtotime($event['event_date'])); ?></div>
                                 </div>
 
-                                <!-- Event Content -->
-                                <div class="event-content me-4">
+                                <div class="event-content me-4 flex-grow-1">
                                     <h4 class="event-title"><?php echo htmlspecialchars($event['event_name']); ?></h4>
                                     
-                                    <div class="event-meta">
+                                    <div class="d-flex flex-wrap gap-3 mb-2">
                                         <div class="event-meta-item">
                                             <i class="bi bi-geo-alt"></i>
                                             <span><?php echo htmlspecialchars($event['event_location']); ?></span>
@@ -596,14 +608,14 @@ $result = $conn->query($query);
                                     </div>
 
                                     <?php if (!empty($event['event_remarks'])): ?>
-                                    <div class="event-description">
+                                    <div class="text-white opacity-75 mb-3">
                                         <i class="bi bi-chat-text me-2"></i>
                                         <?php echo htmlspecialchars(substr($event['event_remarks'], 0, 120)); ?>
                                         <?php echo strlen($event['event_remarks']) > 120 ? '...' : ''; ?>
                                     </div>
                                     <?php endif; ?>
 
-                                    <div class="event-actions">
+                                    <div class="d-flex gap-2">
                                         <button type="button" class="btn btn-outline-info btn-sm" 
                                                 data-bs-toggle="modal" data-bs-target="#viewModal<?php echo $event['id']; ?>">
                                             <i class="bi bi-eye"></i> View Details
@@ -618,7 +630,6 @@ $result = $conn->query($query);
                                     </div>
                                 </div>
 
-                                <!-- Price Tag -->
                                 <div class="price-tag flex-shrink-0">
                                     ₱<?php echo number_format($event['pricing'], 2); ?>
                                 </div>
@@ -628,131 +639,133 @@ $result = $conn->query($query);
                     </div>
                 </div>
             <?php else: ?>
-                <div class="text-center py-5">
-                    <i class="bi bi-calendar-x display-1 text-muted"></i>
-                    <h4 class="text-muted">No Events Found</h4>
-                    <p class="text-muted">Start by adding your first event using the button above.</p>
+                <div class="no-events-state animate-fade-in">
+                    <i class="bi bi-calendar-x"></i>
+                    <h4 class="text-white mb-3">No Events Found</h4>
+                    <p class="text-white opacity-75 mb-4">Start creating amazing events and watch your business grow!</p>
+                    <button class="btn btn-success btn-lg" data-bs-toggle="modal" data-bs-target="#addEventModal">
+                        <i class="bi bi-plus-circle"></i> Create Your First Event
+                    </button>
                 </div>
             <?php endif; ?>
         </section>
     </div>
 
-
- <!-- Add Event Modal | Laynes -->
- <!-- Add Event Modal | Laynes -->
- <!-- Add Event Modal | Laynes -->
-
-
+    <button class="add-event-fab" data-bs-toggle="modal" data-bs-target="#addEventModal" title="Add New Event">
+        <i class="bi bi-plus"></i>
+    </button>
 
     <div class="modal fade" id="addEventModal" tabindex="-1" aria-labelledby="addEventModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header bg-success text-white">
-                <h5 class="modal-title" id="addEventModalLabel">
-                    <i class="bi bi-plus-circle"></i> Add New Event
-                </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <div class="card mb-0">
-                    <!-- Removed duplicate card-header here -->
-                    <div class="card-body">
-                        <form method="POST" action="">
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label for="event_name" class="form-label">Event Name *</label>
-                                    <input type="text" class="form-control" id="event_name" name="event_name" required maxlength="255">
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label for="event_location" class="form-label">Event Location *</label>
-                                    <input type="text" class="form-control" id="event_location" name="event_location" required maxlength="255">
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label for="event_date" class="form-label">Event Date *</label>
-                                    <input type="date" class="form-control" id="event_date" name="event_date" required min="<?php echo date('Y-m-d'); ?>">
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label for="pricing" class="form-label">Pricing (₱) *</label>
-                                    <input type="number" class="form-control" id="pricing" name="pricing" step="0.01" min="0" required>
-                                </div>
-                            </div>
-                            <div class="mb-3">
-                                <label for="event_remarks" class="form-label">Event Remarks</label>
-                                <textarea class="form-control" id="event_remarks" name="event_remarks" rows="3" placeholder="Optional remarks about the event" maxlength="1000"></textarea>
-                                <div class="form-text">
-                                    <span id="charCounter" class="text-muted">1000 characters remaining</span>
-                                </div>
-                            </div>
-                            <button type="submit" name="add_event" class="btn btn-success">
-                                <i class="bi bi-plus-circle"></i> Add Event
-                            </button>
-                        </form>
-                    </div>
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title" id="addEventModalLabel">
+                        <i class="bi bi-plus-circle"></i> Create New Event
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
-            </div> <!-- end modal-body -->
-        </div> <!-- end modal-content -->
-    </div> <!-- end modal-dialog -->
-</div> <!-- end modal -->
-    <!-- Modals -->
- <!-- end modal | Laynes -->
-
-
+                <div class="modal-body">
+                    <form method="POST" action="events.php" id="addEventForm">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="add_event_name" class="form-label">Event Name *</label>
+                                <input type="text" class="form-control" id="add_event_name" name="event_name" required maxlength="255">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="add_event_location" class="form-label">Event Location *</label>
+                                <input type="text" class="form-control" id="add_event_location" name="event_location" required maxlength="255">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="add_event_date" class="form-label">Event Date *</label>
+                                <input type="date" class="form-control" id="add_event_date" name="event_date" required min="<?php echo date('Y-m-d'); ?>">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="add_pricing" class="form-label">Pricing (₱) *</label>
+                                <input type="number" class="form-control" id="add_pricing" name="pricing" step="0.01" min="0" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="add_event_remarks" class="form-label">Event Remarks</label>
+                            <textarea class="form-control" id="add_event_remarks" name="event_remarks" rows="4" placeholder="Optional remarks about the event" maxlength="1000"></textarea>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button type="submit" name="add_event" value="1" class="btn btn-success flex-fill">
+                                <i class="bi bi-plus-circle"></i> Create Event
+                            </button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                <i class="bi bi-x-circle"></i> Cancel
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <?php 
-    $result->data_seek(0); // Reset result pointer
+    $result->data_seek(0);
     while($event = $result->fetch_assoc()): 
     ?>
     
-    <!-- View Modal -->
-    <div class="modal fade" id="viewModal<?php echo $event['id']; ?>" tabindex="-1" aria-labelledby="viewModalLabel<?php echo $event['id']; ?>" aria-hidden="true">
+    <div class="modal fade" id="viewModal<?php echo $event['id']; ?>" tabindex="-1">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header bg-info text-white">
-                    <h5 class="modal-title" id="viewModalLabel<?php echo $event['id']; ?>">
+                    <h5 class="modal-title">
                         <i class="bi bi-eye"></i> Event Details
                     </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <div class="row">
                         <div class="col-md-6">
-                            <h6><i class="bi bi-calendar-event text-primary"></i> Event Name:</h6>
-                            <p class="fs-5 fw-bold"><?php echo htmlspecialchars($event['event_name']); ?></p>
+                            <div class="mb-3">
+                                <h6 class="text-white opacity-75"><i class="bi bi-calendar-event"></i> Event Name:</h6>
+                                <p class="h5 text-white"><?php echo htmlspecialchars($event['event_name']); ?></p>
+                            </div>
                             
-                            <h6><i class="bi bi-geo-alt text-primary"></i> Location:</h6>
-                            <p><?php echo htmlspecialchars($event['event_location']); ?></p>
+                            <div class="mb-3">
+                                <h6 class="text-white opacity-75"><i class="bi bi-geo-alt"></i> Location:</h6>
+                                <p class="text-white"><?php echo htmlspecialchars($event['event_location']); ?></p>
+                            </div>
                             
-                            <h6><i class="bi bi-calendar text-primary"></i> Event Date:</h6>
-                            <p><?php echo date('F d, Y (l)', strtotime($event['event_date'])); ?></p>
+                            <div class="mb-3">
+                                <h6 class="text-white opacity-75"><i class="bi bi-calendar"></i> Event Date:</h6>
+                                <p class="text-white"><?php echo date('F d, Y (l)', strtotime($event['event_date'])); ?></p>
+                            </div>
                         </div>
                         <div class="col-md-6">
-                            <h6><i class="bi bi-cash text-success"></i> Pricing:</h6>
-                            <p class="h4 text-success">₱<?php echo number_format($event['pricing'], 2); ?></p>
+                            <div class="mb-3">
+                                <h6 class="text-white opacity-75"><i class="bi bi-cash"></i> Pricing:</h6>
+                                <div class="price-tag">₱<?php echo number_format($event['pricing'], 2); ?></div>
+                            </div>
                             
-                            <h6><i class="bi bi-clock text-muted"></i> Date Added:</h6>
-                            <p><?php echo date('F d, Y \a\t g:i A', strtotime($event['date_added'])); ?></p>
+                            <div class="mb-3">
+                                <h6 class="text-white opacity-75"><i class="bi bi-clock"></i> Date Added:</h6>
+                                <p class="text-white"><?php echo date('F d, Y \a\t g:i A', strtotime($event['date_added'])); ?></p>
+                            </div>
                             
-                            <h6><i class="bi bi-info-circle text-warning"></i> Status:</h6>
-                            <p>
+                            <div class="mb-3">
+                                <h6 class="text-white opacity-75"><i class="bi bi-info-circle"></i> Status:</h6>
                                 <?php if (strtotime($event['event_date']) < strtotime('today')): ?>
-                                    <span class="badge bg-secondary fs-6">Past Event</span>
+                                    <span class="status-badge past">Past Event</span>
                                 <?php elseif (strtotime($event['event_date']) == strtotime('today')): ?>
-                                    <span class="badge bg-warning fs-6">Today</span>
+                                    <span class="status-badge today">Today</span>
                                 <?php else: ?>
-                                    <span class="badge bg-success fs-6">Upcoming</span>
+                                    <span class="status-badge upcoming">Upcoming</span>
                                 <?php endif; ?>
-                            </p>
+                            </div>
                         </div>
                     </div>
                     
                     <?php if (!empty($event['event_remarks'])): ?>
                     <div class="row">
                         <div class="col-12">
-                            <h6><i class="bi bi-chat-text text-info"></i> Event Remarks:</h6>
-                            <div class="bg-light p-3 rounded">
-                                <?php echo nl2br(htmlspecialchars($event['event_remarks'])); ?>
+                            <h6 class="text-white opacity-75"><i class="bi bi-chat-text"></i> Event Remarks:</h6>
+                            <div class="p-3 rounded" style="background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.3);">
+                                <p class="text-dark mb-0" style="color: #2d3748 !important; font-weight: 500; line-height: 1.6;"><?php echo nl2br(htmlspecialchars($event['event_remarks'])); ?></p>
                             </div>
                         </div>
                     </div>
@@ -770,20 +783,19 @@ $result = $conn->query($query);
         </div>
     </div>
 
-    <!-- Delete Modal -->
-    <div class="modal fade" id="deleteModal<?php echo $event['id']; ?>" tabindex="-1" aria-labelledby="deleteModalLabel<?php echo $event['id']; ?>" aria-hidden="true">
+    <div class="modal fade" id="deleteModal<?php echo $event['id']; ?>" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header bg-danger text-white">
-                    <h5 class="modal-title" id="deleteModalLabel<?php echo $event['id']; ?>">
+                    <h5 class="modal-title">
                         <i class="bi bi-exclamation-triangle"></i> Confirm Delete
                     </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body text-center">
-                    <i class="bi bi-trash display-1 text-danger mb-3"></i>
-                    <h5>Are you sure you want to delete this event?</h5>
-                    <p class="text-muted">
+                    <i class="bi bi-trash" style="font-size: 4rem; color: #fa709a; margin-bottom: 1rem;"></i>
+                    <h5 class="text-white">Are you sure you want to delete this event?</h5>
+                    <p class="text-white opacity-75">
                         <strong>"<?php echo htmlspecialchars($event['event_name']); ?>"</strong><br>
                         This action cannot be undone.
                     </p>
@@ -805,9 +817,14 @@ $result = $conn->query($query);
 
     <?php endwhile; ?>
 
-    <footer class="bg-light mt-auto py-4">
+    <footer class="mt-5 py-4">
         <div class="container text-center">
-            <p class="text-muted mb-0">&copy; GalaGo Events Monitoring System. All rights reserved.</p>
+            <p class="text-white opacity-75 mb-0">
+                &copy; <?php echo date('Y'); ?> GalaGo Events Monitoring System. All rights reserved.
+            </p>
+            <small class="text-white opacity-50">
+                Crafted with ❤️ for amazing event management
+            </small>
         </div>
     </footer>
 
@@ -820,20 +837,77 @@ $result = $conn->query($query);
             const gridBtn = document.getElementById('gridBtn');
             const listBtn = document.getElementById('listBtn');
             
+            if (!gridView || !listView || !gridBtn || !listBtn) {
+                console.error('View toggle elements not found');
+                return;
+            }
+            
             if (viewType === 'list') {
                 gridView.classList.remove('active');
                 listView.classList.add('active');
                 gridBtn.classList.remove('active');
                 listBtn.classList.add('active');
+                gridView.style.display = 'none';
+                listView.style.display = 'block';
+                listView.style.opacity = '0';
+                listView.style.transition = 'all 0.3s ease';
+                setTimeout(() => {
+                    listView.style.opacity = '1';
+                    listView.style.transform = 'translateY(0)';
+                }, 50);
             } else {
                 listView.classList.remove('active');
                 gridView.classList.add('active');
                 listBtn.classList.remove('active');
                 gridBtn.classList.add('active');
+                listView.style.display = 'none';
+                gridView.style.display = 'block';
+                gridView.style.opacity = '0';
+                gridView.style.transition = 'all 0.3s ease';
+                setTimeout(() => {
+                    gridView.style.opacity = '1';
+                    gridView.style.transform = 'translateY(0)';
+                }, 50);
             }
         }
 
-        // Character counter for event remarks
+        function filterEvents() {
+            const searchInput = document.getElementById('eventSearch');
+            if (!searchInput) {
+                console.error('Search input not found');
+                return;
+            }
+            
+            const filter = searchInput.value.toLowerCase();
+            const cards = document.querySelectorAll('.event-card, .event-list-item');
+
+            if (cards.length === 0) {
+                console.warn('No event cards found to filter');
+                return;
+            }
+
+            cards.forEach(card => {
+                const text = card.textContent.toLowerCase();
+                if (text.indexOf(filter) > -1) {
+                    card.style.display = '';
+                    card.style.opacity = '0';
+                    card.style.transform = 'translateY(20px)';
+                    card.style.transition = 'all 0.3s ease';
+                    setTimeout(() => {
+                        card.style.opacity = '1';
+                        card.style.transform = 'translateY(0)';
+                    }, 100);
+                } else {
+                    card.style.opacity = '0';
+                    card.style.transform = 'translateY(-20px)';
+                    card.style.transition = 'all 0.3s ease';
+                    setTimeout(() => {
+                        card.style.display = 'none';
+                    }, 300);
+                }
+            });
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             const remarksTextarea = document.getElementById('event_remarks');
             const charCounter = document.getElementById('charCounter');
@@ -843,15 +917,109 @@ $result = $conn->query($query);
                 const currentLength = remarksTextarea.value.length;
                 const remaining = Math.max(0, maxLength - currentLength);
                 charCounter.textContent = `${remaining} characters remaining`;
+                
                 if (remaining <= 50) {
                     charCounter.className = 'text-warning';
+                    charCounter.style.fontWeight = '700';
+                    charCounter.style.textShadow = '0 0 10px rgba(255, 193, 7, 0.5)';
                 } else {
-                    charCounter.className = 'text-muted';
+                    charCounter.className = 'text-white opacity-75';
+                    charCounter.style.fontWeight = '600';
+                    charCounter.style.textShadow = 'none';
                 }
             }
 
-            remarksTextarea.addEventListener('input', updateCharCounter);
-            updateCharCounter();
+            if (remarksTextarea && charCounter) {
+                remarksTextarea.addEventListener('input', updateCharCounter);
+                updateCharCounter();
+            }
+        });
+
+        (function() {
+            'use strict';
+            window.addEventListener('load', function() {
+                var forms = document.getElementsByClassName('needs-validation');
+                Array.prototype.filter.call(forms, function(form) {
+                    form.addEventListener('submit', function(event) {
+                        if (form.checkValidity() === false) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                        } else {
+                            const submitBtn = form.querySelector('button[type="submit"]');
+                            submitBtn.innerHTML = '<i class="bi bi-check-circle"></i> Creating...';
+                            submitBtn.classList.add('success-animation');
+                        }
+                        form.classList.add('was-validated');
+                    }, false);
+                });
+            }, false);
+        })();
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const gridView = document.getElementById('gridView');
+            const listView = document.getElementById('listView');
+            const gridBtn = document.getElementById('gridBtn');
+            const listBtn = document.getElementById('listBtn');
+            
+            if (gridView && listView && gridBtn && listBtn) {
+                gridView.classList.add('active');
+                gridView.style.display = 'block';
+                listView.classList.remove('active');
+                listView.style.display = 'none';
+                gridBtn.classList.add('active');
+                listBtn.classList.remove('active');
+            }
+            
+            const elements = document.querySelectorAll('.animate-fade-in, .animate-slide-up');
+            if (elements.length > 0) {
+                elements.forEach((el, index) => {
+                    el.style.animationDelay = `${index * 0.1}s`;
+                });
+            }
+
+            const anchorLinks = document.querySelectorAll('a[href^="#"]');
+            if (anchorLinks.length > 0) {
+                anchorLinks.forEach(anchor => {
+                    anchor.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        const target = document.querySelector(this.getAttribute('href'));
+                        if (target) {
+                            target.scrollIntoView({
+                                behavior: 'smooth',
+                                block: 'start'
+                            });
+                        }
+                    });
+                });
+            }
+
+            const alerts = document.querySelectorAll('.alert-success');
+            if (alerts.length > 0) {
+                alerts.forEach(alert => {
+                    setTimeout(() => {
+                        if (alert && alert.classList.contains('show')) {
+                            alert.classList.remove('show');
+                            setTimeout(() => {
+                                if (alert.parentElement) {
+                                    alert.remove();
+                                }
+                            }, 150);
+                        }
+                    }, 5000);
+                });
+            }
+        });
+
+        document.querySelectorAll('.event-card, .event-list-item').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-8px) scale(1.02)';
+                this.style.boxShadow = '0 25px 50px rgba(0, 0, 0, 0.3)';
+            });
+
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0) scale(1)';
+                this.style.boxShadow = '0 25px 50px rgba(0, 0, 0, 0.25)';
+            });
         });
     </script>
 </body>
