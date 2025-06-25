@@ -11,12 +11,24 @@ main {
 }
 
 .navbar {
-    background-color: #6a2fe4 !important;
+    background-color: rgba(106, 47, 228, 0.85) !important; /* semi-transparent purple */
+    min-height: 80px; /* increase height */
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+    box-shadow: 0 4px 16px rgba(106, 47, 228, 0.08);
+    backdrop-filter: blur(8px); /* optional: adds a blur effect for more transparency feel */
 }
 
 .navbar-brand {
     font-weight: 600;
     font-size: 1.5rem;
+}
+
+.navbar-nav {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    max-width: 100vw;
+    scrollbar-width: thin;
 }
 
 .navbar-nav .nav-link {
@@ -28,6 +40,19 @@ main {
     transform: translateY(-1px);
 }
 
+.navbar-nav::-webkit-scrollbar {
+    height: 6px;
+    background: #eee;
+}
+.navbar-nav::-webkit-scrollbar-thumb {
+    background: #6a2fe4;
+    border-radius: 3px;
+}
+
+/* Optional: prevent nav links from wrapping */
+.navbar-nav .nav-item {
+    white-space: nowrap;
+}
 
 .card {
     border: none;
@@ -41,20 +66,122 @@ main {
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
 }
 
-.card-header {
+.card-header.text-white {
     border-radius: 10px 10px 0 0 !important;
     border-bottom: none;
     font-weight: 600;
+    color: #fff !important;
+}
+
+.card-header.text-white,
+.card-header.text-white * {
+    color: #fff !important;
 }
 
 .jumbotron {
-    background: linear-gradient(135deg, #f4f5f7 0%, #e9ecef 100%);
-    border-radius: 15px;
-    box-shadow: 0 8px 25px rgba(0, 123, 255, 0.3);
+background: linear-gradient(135deg, #f4f5f7 0%, #e9ecef 100%);
+border-radius: 15px;
+box-shadow: 0 8px 25px rgba(0, 123, 255, 0.3);
 }
 
-.jumbotron h1, p, i {
-    color: #000;
+.jumbotron h1,
+.jumbotron p,
+.jumbotron i {
+color: #000;
+}
+
+
+/*  test */
+
+.hero-section {
+    min-height: 70vh;
+    display: flex;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 2;
+}
+
+.hero-title {
+    font-size: 4rem;
+    font-weight: 900;
+    color: #181818;
+    background: none !important;
+    -webkit-background-clip: unset !important;
+    -webkit-text-fill-color: unset !important;
+    background-clip: unset !important;
+    margin-bottom: 1.5rem;
+    text-shadow: 0 4px 8px rgba(24, 24, 24, 0.08);
+}
+
+.hero-subtitle {
+    font-size: 1.5rem;
+    color: #333 !important;
+    margin-bottom: 2rem;
+    font-weight: 400;
+}
+
+.hero-cta {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 3rem;
+}
+
+.hero-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 2rem;
+    margin-top: 3rem;
+}
+
+.hero-stat {
+    text-align: center;
+    background: #fff !important;
+    border: 2px solid #e0e0e0 !important;
+    border-radius: 16px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+    color: #181818 !important;
+    box-shadow: 0 2px 12px rgba(60, 72, 88, 0.06);
+}
+
+.hero-stat:hover {
+    transform: translateY(-5px);
+    background: #f8f9fa !important;
+    box-shadow: 0 8px 24px rgba(60, 72, 88, 0.10);
+}
+
+.stat-number {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: #6a2fe4 !important;
+    background: none !important;
+    -webkit-background-clip: unset !important;
+    -webkit-text-fill-color: unset !important;
+    background-clip: unset !important;
+    display: block;
+}
+
+.stat-label {
+    color: #444 !important;
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+
+.btn-create-event {
+    background: #6a2fe4 !important;
+    color: #fff !important;
+    border: none !important;
+}
+
+.btn-create-event:hover, .btn-create-event:focus {
+    background: #5423b9 !important;
+    color: #fff !important;
 }
 
 .btn {
@@ -166,22 +293,151 @@ main {
     color:#6a2fe4;
 }
 
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+
+/* Team Credits Section */
+.team-credits {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 20px;
+    padding: 2rem;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    margin: 3rem 0;
 }
 
-.card {
-    animation: fadeInUp 0.6s ease-out;
+.team-title {
+    color: black;
+    opacity: 70;
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+.team-members {
+    color: gray;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.team-member {
+    background: #f4f5f7;
+    color: #333;
+    padding: 0.5rem 1rem;
+    border-radius: 25px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    border: 1px solid #e0e0e0;
+    transition: all 0.3s ease;
+}
+
+.team-member:hover {
+    background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+    color: #222;
+    transform: scale(1.05);
+    box-shadow: 0 4px 15px rgba(100, 116, 139, 0.12);
+}
+
+.white-container {
+    background: #fff;
+    border: 2px solid #bbaaff; /* soft purple border */
+    border-radius: 28px;
+    box-shadow: 0 8px 32px rgba(106, 47, 228, 0.08), 0 2px 12px rgba(60, 72, 88, 0.10);
+    padding: 2.5rem 3.5rem;
+    margin: 2.5rem auto;
+    max-width: 1600px; /* increased width */
+    transition: box-shadow 0.3s, border-color 0.3s;
+}
+
+.white-container:hover {
+    box-shadow: 0 12px 40px rgba(106, 47, 228, 0.13), 0 4px 16px rgba(60, 72, 88, 0.12);
+    border-color: #6a2fe4;
+}
+
+
+/* Dashboard Card (for the "Ready to Get Started?" section) */
+.dashboard-card {
+    background: rgba(255, 255, 255, 0.55); /* semi-transparent white */
+    border: 1.5px solid rgba(106, 47, 228, 0.12); /* subtle purple border */
+    border-radius: 24px;
+    padding: 2rem;
+    box-shadow: 0 8px 32px 0 rgba(60, 72, 88, 0.12), 0 1.5px 8px 0 rgba(106, 47, 228, 0.04);
+    backdrop-filter: blur(16px) saturate(180%);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    position: relative;
+    overflow: hidden;
+    height: 100%;
+    transition: box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1), background 0.4s;
+}
+
+.dashboard-card .card-icon.primary {
+    background: linear-gradient(135deg, #6a2fe4 0%, #818cf8 100%);
+    width: 60px;
+    height: 60px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    color: #fff;
+    box-shadow: 0 8px 25px rgba(129, 140, 248, 0.15);
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.card-title {
+    color: #2d2363;
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    letter-spacing: 0.5px;
+    text-shadow: 0 1px 4px rgba(106, 47, 228, 0.08);
+}
+
+.card-description {
+    color: #333;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+    text-shadow: 0 1px 4px rgba(255,255,255,0.08);
+}
+
+/* Optional: Add a subtle border highlight on hover */
+.dashboard-card:hover {
+    box-shadow: 0 12px 40px 0 rgba(106, 47, 228, 0.13), 0 2px 12px 0 rgba(60, 72, 88, 0.10);
+    background: rgba(255, 255, 255, 0.65);
+}
+
+/* Custom Jumbotron */
+.custom-jumbotron {
+    width: 100vw;
+    margin-left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, #f8faff 0%, #e9ecef 100%);
+    border-radius: 32px;
+    box-shadow: 0 12px 48px rgba(106, 47, 228, 0.08), 0 2px 12px rgba(60, 72, 88, 0.10);
+    border: 2px solid #bbaaff;
+    padding: 3.5rem 4vw 3rem 4vw;
+    margin: 2.5rem 0;
+    max-width: 98vw;
+    text-align: left;
+}
+
+.custom-jumbotron h1,
+.custom-jumbotron p,
+.custom-jumbotron i {
+    color: #22223b;
+}
+
+.custom-jumbotron .btn {
+    margin-top: 1.5rem;
 }
 
 @media (max-width: 768px) {
+    .team-members {
+        flex-direction: column;
+        align-items: center;
+    }
+    
     .jumbotron {
         padding: 2rem !important;
     }
@@ -204,6 +460,109 @@ main {
     
     .table-responsive {
         font-size: 0.85rem;
+    }
+    
+    .custom-jumbotron {
+        padding: 2rem 1rem;
+        border-radius: 18px;
+    }
+    .custom-jumbotron h1 {
+        font-size: 2rem;
+    }
+}
+
+/* Responsive improvements for hero and container */
+.container {
+    max-width: 1400px;
+    padding-left: 2.5rem;
+    padding-right: 2.5rem;
+}
+
+.hero-section {
+    padding: 3rem 0 2rem 0;
+}
+
+.hero-content {
+    width: 100%;
+    padding: 2rem 0;
+}
+
+.hero-title {
+    font-size: 4.2rem;
+}
+
+.hero-subtitle {
+    font-size: 1.7rem;
+}
+
+@media (max-width: 1200px) {
+    .container {
+        max-width: 98vw;
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
+    }
+    .hero-title {
+        font-size: 3rem;
+    }
+    .hero-subtitle {
+        font-size: 1.2rem;
+    }
+}
+
+@media (max-width: 900px) {
+    .hero-section {
+        padding: 2rem 0 1rem 0;
+    }
+    .hero-title {
+        font-size: 2.2rem;
+    }
+    .hero-subtitle {
+        font-size: 1rem;
+    }
+    .hero-content {
+        padding: 1rem 0;
+    }
+    .hero-stats {
+        gap: 1rem;
+        margin-top: 1.2rem;
+    }
+}
+
+@media (max-width: 600px) {
+    .container {
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+    }
+    .hero-section {
+        padding: 1rem 0 0.5rem 0;
+        min-height: unset;
+    }
+    .hero-title {
+        font-size: 1.3rem;
+        margin-bottom: 0.7rem;
+    }
+    .hero-subtitle {
+        font-size: 0.95rem;
+        margin-bottom: 1rem;
+    }
+    .hero-cta {
+        flex-direction: column;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+    }
+    .hero-stats {
+        grid-template-columns: 1fr;
+        gap: 0.7rem;
+        margin-top: 0.7rem;
+    }
+    .hero-stat {
+        padding: 0.7rem;
+    }
+    .stat-number {
+        font-size: 1.2rem;
+    }
+    .stat-label {
+        font-size: 0.8rem;
     }
 }
 
