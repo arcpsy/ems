@@ -18,7 +18,7 @@
     <?php include 'inc/navbar.php'; ?>
 
     <!-- Main content -->
-    <main class="container-lg mt-4">
+    <main class="container">
         <?php include 'inc/flash-messages.php'; ?>
 
         <!-- Page-specific content -->
