@@ -128,58 +128,9 @@ ob_start();
     </div>
 </div>
 
-<div class="row mt-4">
-    <div class="col-12">
-        <div class="card">
-            <div class="card-header text-white" style="background-color: #6a2fe4;">
-                <h5 class="card-title mb-0">
-                    <i class="bi bi-info-circle"></i> System Features
-                </h5>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-3 text-center mb-3">
-                        <i class="bi bi-plus-circle display-4 text-success"></i>
-                        <h6>Add Events</h6>
-                        <p class="text-muted small">Create new events with all details</p>
-                    </div>
-                    <div class="col-md-3 text-center mb-3">
-                        <i class="bi bi-pencil-square display-4 text-primary"></i>
-                        <h6>Edit Events</h6>
-                        <p class="text-muted small">Update event information anytime</p>
-                    </div>
-                    <div class="col-md-3 text-center mb-3">
-                        <i class="bi bi-trash display-4 text-danger"></i>
-                        <h6>Delete Events</h6>
-                        <p class="text-muted small">Remove events when no longer needed</p>
-                    </div>
-                    <div class="col-md-3 text-center mb-3">
-                        <i class="bi bi-eye display-4 text-info"></i>
-                        <h6>View All</h6>
-                        <p class="text-muted small">List and manage all events</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 
- <div class="white-container loading-animation" style="animation-delay: 0.6s;">
-    <section class="team-credits m-0 p-0" style="background: none; border: none; box-shadow: none;">
-        <h4 class="team-title">Meet Our Amazing Development Team</h4>
-        <p class="text-black opacity-75 mb-4">
-            Created with passion and dedication by talented developers
-        </p>
-        <div class="team-members">
-            <span class="team-member">Ferdinand John Dobli</span>
-            <span class="team-member">Tristan Kyle Dagatan</span>
-            <span class="team-member">Carlo Allan Laynes</span>
-            <span class="team-member">Meynard Roi Manuel</span>
-            <span class="team-member">Michael Andrei Niñora</span>
-            <span class="team-member">Tristan James Sintos</span>
-        </div>
-    </section>
-</div>
+<?php include 'includes/features-grid.php'; ?>
+<?php include 'includes/dev-team-section.php'; ?>
 
         <section class="text-center py-5 loading-animation" style="animation-delay: 0.8s;">
             <div class="dashboard-card" style="max-width: 600px; margin: 0 auto;">
