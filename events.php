@@ -54,8 +54,6 @@ ob_start();
 ?>
 
 <body class="d-flex flex-column min-vh-100">
-    <!-- Navigation -->
-    <?php include 'inc/navbar.php'; ?>
 
     <div class="container-sm mt-4 flex-grow-1">
        <h1 class="mb-4">
@@ -449,14 +447,6 @@ ob_start();
     </div>
 
     <?php endwhile; ?>
-
-    <footer class="bg-light mt-auto py-4">
-        <div class="container text-center">
-            <p class="text-muted mb-0">&copy; GalaGo Events Monitoring System. All rights reserved.</p>
-        </div>
-    </footer>
-
-    <script src="js/script.js"></script>
     
     <script>
         function toggleView(viewType) {
@@ -502,6 +492,6 @@ ob_start();
 
 <?php
 $content = ob_get_clean();
-include 'template/base.html';
+include 'template/base.php';
 ?>
 </body>
