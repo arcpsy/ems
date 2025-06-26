@@ -206,17 +206,19 @@ document.addEventListener('DOMContentLoaded', function() {
         autoSaveForm();
     }
 
-    // Shrink navbar on scroll
     const navbar = document.querySelector('.gala-navbar');
-    if (navbar) {
-        window.addEventListener('scroll', function () {
-            if (window.scrollY > 10) {
-                navbar.classList.add('shrink');
-            } else {
-                navbar.classList.remove('shrink');
-            }
-        });
-    }
-    
+
+    // Normal scroll-based shrink
+    window.addEventListener('scroll', function () {
+        if (!navbar) return;
+
+        if (window.scrollY > 10) {
+            navbar.classList.add('shrink');
+        } else {
+            navbar.classList.remove('shrink');
+        }
+    });
+
     console.log('Events Monitoring System initialized successfully!');
 });
+

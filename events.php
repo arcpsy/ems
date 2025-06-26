@@ -783,6 +783,7 @@ $result = $conn->query($query);
     </footer>
 
     <script src="js/script.js"></script>
+    
     <script>
         function toggleView(viewType) {
             const gridView = document.getElementById('gridView');
