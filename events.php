@@ -46,8 +46,8 @@ if (isset($_POST['delete_event']) && is_numeric($_POST['event_id'])) {
 // Fetch all events
 $query = "SELECT * FROM events ORDER BY event_date DESC";
 $result = $conn->query($query);
-
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -327,21 +327,6 @@ $result = $conn->query($query);
     <?php include 'inc/navbar.php'; ?>
 
     <div class="container-sm mt-4 flex-grow-1">
-        <!-- Success/Error Messages -->
-        <?php if (isset($_SESSION['success'])): ?>
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                <i class="bi bi-check-circle"></i> <?php echo $_SESSION['success']; unset($_SESSION['success']); ?>
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        <?php endif; ?>
-
-        <?php if (isset($_SESSION['error'])): ?>
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <i class="bi bi-exclamation-triangle"></i> <?php echo $_SESSION['error']; unset($_SESSION['error']); ?>
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        <?php endif; ?>
-
        <h1 class="mb-4">
             <i class="bi bi-clipboard-data" style="color: #818589;"></i> Events Management
         </h1>
