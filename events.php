@@ -366,7 +366,7 @@ $result = $conn->query($query);
 </head>
 <body class="d-flex flex-column min-vh-100">
     <!-- Navigation -->
-    <?php include 'includes/navbar.php'; ?>
+    <?php include 'inc/navbar.php'; ?>
 
     <div class="container-sm mt-4 flex-grow-1">
         <!-- Success/Error Messages -->

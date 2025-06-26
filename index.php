@@ -25,17 +25,17 @@ ob_start();
 ?>
 
 <div class="container">
-    <?php include 'includes/hero-section.php'; ?>
+    <?php include 'inc/home/hero-section.php'; ?>
     <div class="row align-items-stretch">
-        <?php include 'includes/system-overview-card.php'; ?>
-        <?php include 'includes/upcoming-events-card.php'; ?>
+        <?php include 'inc/home/system-overview-card.php'; ?>
+        <?php include 'inc/home/upcoming-events-card.php'; ?>
     </div>
-    <?php include 'includes/features-grid.php'; ?>
-    <?php include 'includes/dev-team-section.php'; ?>
-    <?php include 'includes/get-started-cta.php'; ?>
+    <?php include 'inc/home/features-grid.php'; ?>
+    <?php include 'inc/home/dev-team-section.php'; ?>
+    <?php include 'inc/home/get-started-cta.php'; ?>
 </div>
 
 <?php
 $content = ob_get_clean();
-include 'templates/base.html';
+include 'template/base.html';
 ?>
