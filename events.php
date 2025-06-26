@@ -99,7 +99,7 @@ $result = $conn->query($query);
     <link rel="stylesheet" href="css/bootstrap.min.css">
     <link rel="stylesheet" href="css/bootstrap-icons.min.css">
     <link href="css/style.css" rel="stylesheet">
-    <script defer src="../js/bootstrap.bundle.min.js"></script>
+    <script defer src="js/bootstrap.bundle.min.js"></script>
     <style>
         /* Card View Styles */
         .event-card {
