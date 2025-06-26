@@ -98,5 +98,5 @@ ob_start();
 
 <?php
 $content = ob_get_clean();
-include 'template/base.html';
+include 'template/base.php';
 ?>
