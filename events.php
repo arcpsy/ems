@@ -1,59 +1,18 @@
 <?php
 session_start();
 require_once 'config/config.php';
+require_once 'inc/event_list/event-handler.php';
 
 $page_title = "GalaGo - Events Monitoring System - Events";
 
 $page_css = "css/events.css";
+$page_js = "js/events.js";
 $body_class = "d-flex flex-column min-vh-100";
-
-// Handle form submission for adding new event
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_event'])) {
-    $event_name = mysqli_real_escape_string($conn, $_POST['event_name']);
-    $event_location = mysqli_real_escape_string($conn, $_POST['event_location']);
-    $event_date = mysqli_real_escape_string($conn, $_POST['event_date']);
-    $event_remarks = mysqli_real_escape_string($conn, $_POST['event_remarks']);
-    $pricing = (float)$_POST['pricing'];
-    
-    if (!empty($event_name) && !empty($event_location) && !empty($event_date) && $pricing >= 0) {
-        $stmt = $conn->prepare("INSERT INTO events (event_name, event_location, event_date, event_remarks, pricing) VALUES (?, ?, ?, ?, ?)");
-        $stmt->bind_param("ssssd", $event_name, $event_location, $event_date, $event_remarks, $pricing);
-        
-        if ($stmt->execute()) {
-            $_SESSION['success'] = "Event added successfully!";
-        } else {
-            $_SESSION['error'] = "Error adding event";
-        }
-        $stmt->close();
-        header("Location: events.php");
-        exit();
-    }
-}
-
-// Handle delete request
-if (isset($_POST['delete_event']) && is_numeric($_POST['event_id'])) {
-    $event_id = (int)$_POST['event_id'];
-    $stmt = $conn->prepare("DELETE FROM events WHERE id = ?");
-    $stmt->bind_param("i", $event_id);
-    
-    if ($stmt->execute()) {
-        $_SESSION['success'] = "Event deleted successfully!";
-    } else {
-        $_SESSION['error'] = "Error deleting event";
-    }
-    $stmt->close();
-    header("Location: events.php");
-    exit();
-}
-
-// Fetch all events
-$query = "SELECT * FROM events ORDER BY event_date DESC";
-$result = $conn->query($query);
 
 ob_start();
 ?>
 
-<body class="d-flex flex-column min-vh-100">
+<div>
 
     <div class="container-sm mt-4 flex-grow-1">
        <h1 class="mb-4">
@@ -448,50 +407,8 @@ ob_start();
 
     <?php endwhile; ?>
     
-    <script>
-        function toggleView(viewType) {
-            const gridView = document.getElementById('gridView');
-            const listView = document.getElementById('listView');
-            const gridBtn = document.getElementById('gridBtn');
-            const listBtn = document.getElementById('listBtn');
-            
-            if (viewType === 'list') {
-                gridView.classList.remove('active');
-                listView.classList.add('active');
-                gridBtn.classList.remove('active');
-                listBtn.classList.add('active');
-            } else {
-                listView.classList.remove('active');
-                gridView.classList.add('active');
-                listBtn.classList.remove('active');
-                gridBtn.classList.add('active');
-            }
-        }
-
-        // Character counter for event remarks
-        document.addEventListener('DOMContentLoaded', function() {
-            const remarksTextarea = document.getElementById('event_remarks');
-            const charCounter = document.getElementById('charCounter');
-            const maxLength = 1000;
-
-            function updateCharCounter() {
-                const currentLength = remarksTextarea.value.length;
-                const remaining = Math.max(0, maxLength - currentLength);
-                charCounter.textContent = `${remaining} characters remaining`;
-                if (remaining <= 50) {
-                    charCounter.className = 'text-warning';
-                } else {
-                    charCounter.className = 'text-muted';
-                }
-            }
-
-            remarksTextarea.addEventListener('input', updateCharCounter);
-            updateCharCounter();
-        });
-    </script>
-
 <?php
 $content = ob_get_clean();
 include 'template/base.php';
 ?>
-</body>
+</div>

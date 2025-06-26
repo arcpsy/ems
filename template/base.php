@@ -33,5 +33,8 @@
     </footer>
 
     <script src="js/script.js"></script>
+    <?php if (!empty($page_js)): ?>
+    <script src="<?= $page_js ?>"></script>
+    <?php endif; ?>
 </body>
 </html>
