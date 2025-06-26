@@ -4,12 +4,12 @@
 ================================================================================
 
 GROUP MEMBERS:
-- Dagatan, Tristan Kyle - Moral Support
-- Dobli, Ferdinand John - Fullstack Developer, MAMP & Database Setup
-- Laynes, Carlo Allan - Frontend Developer, XAMPP Setup
-- Manuel, Meynard Roi  - Documentator
-- Niñora, Michael Andrei - Frontend Developer
-- Sintos, Tristan - The Questioner
+- Dagatan, Tristan Kyle 
+- Dobli, Ferdinand John
+- Laynes, Carlo Allan 
+- Manuel, Meynard Roi  
+- Niñora, Michael Andrei 
+- Sintos, Tristan 
 
 ================================================================================
 SYSTEM OVERVIEW
