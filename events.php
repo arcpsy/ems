@@ -1,8 +1,11 @@
 <?php
-// Make sure you have:
-
 session_start();
 require_once 'config/config.php';
+
+$page_title = "GalaGo - Events Monitoring System - Events";
+
+$page_css = "css/events.css";
+$body_class = "d-flex flex-column min-vh-100";
 
 // Handle form submission for adding new event
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_event'])) {
@@ -46,282 +49,10 @@ if (isset($_POST['delete_event']) && is_numeric($_POST['event_id'])) {
 // Fetch all events
 $query = "SELECT * FROM events ORDER BY event_date DESC";
 $result = $conn->query($query);
+
+ob_start();
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Events Management</title>
-    <link rel="stylesheet" href="css/bootstrap.min.css">
-    <link rel="stylesheet" href="css/bootstrap-icons.min.css">
-    <link href="css/style.css" rel="stylesheet">
-    <script defer src="js/bootstrap.bundle.min.js"></script>
-    <style>
-        /* Card View Styles */
-        .event-card {
-            transition: all 0.3s ease;
-            border: none;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        .event-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-        }
-        .event-status-past { border-left: 4px solid #6c757d; }
-        .event-status-today { border-left: 4px solid #ffc107; }
-        .event-status-upcoming { border-left: 4px solid #198754; }
-        .pricing-badge {
-            font-size: 1.2rem;
-            font-weight: 600;
-        }
-        .event-date-large {
-            font-size: 2rem;
-            font-weight: bold;
-            line-height: 1;
-        }
-        .event-month {
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            font-weight: 600;
-        }
-
-        /* List View Styles */
-        .list-view {
-            display: none;
-        }
-        .list-view.active {
-            display: block;
-        }
-        .grid-view.active {
-            display: block;
-        }
-        .grid-view {
-            display: none;
-        }
-
-        .event-list-item {
-            background: linear-gradient(135deg, #fff 0%, #black 100%);
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            border: 1px solid rgba(0,0,0,0.05);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .event-list-item:hover {
-            transform: translateX(10px);
-            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
-        }
-
-        .event-list-item::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 6px;
-            transition: all 0.3s ease;
-        }
-
-        .event-list-item.status-upcoming::before {
-            background: linear-gradient(180deg, #28a745 0%, #20c997 100%);
-        }
-        .event-list-item.status-today::before {
-            background: linear-gradient(180deg, #ffc107 0%, #fd7e14 100%);
-        }
-        .event-list-item.status-past::before {
-            background: linear-gradient(180deg, #6c757d 0%, #495057 100%);
-        }
-
-        .event-date-circle {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            color: white;
-            position: relative;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        }
-
-        .event-date-circle.upcoming {
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-        }
-        .event-date-circle.today {
-            background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
-        }
-        .event-date-circle.past {
-            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
-        }
-
-        .event-date-day {
-            font-size: 1.8rem;
-            line-height: 1;
-        }
-        .event-date-month {
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            opacity: 0.9;
-        }
-
-        .event-content {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .event-title {
-            font-size: 1.4rem;
-            font-weight: 700;
-            color: #2c3e50;
-            margin-bottom: 0.5rem;
-            line-height: 1.2;
-        }
-
-        .event-meta {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1rem;
-            margin-bottom: 0.75rem;
-        }
-
-        .event-meta-item {
-            display: flex;
-            align-items: center;
-            gap: 0.4rem;
-            color: #6c757d;
-            font-size: 0.9rem;
-        }
-
-        .event-meta-item i {
-            color: #007bff;
-            width: 16px;
-        }
-
-        .event-description {
-            color: #6c757d;
-            font-size: 0.9rem;
-            line-height: 1.4;
-            margin-bottom: 1rem;
-        }
-
-        .event-actions {
-            display: flex;
-            gap: 0.5rem;
-            flex-wrap: wrap;
-        }
-
-        .price-tag {
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 25px;
-            font-weight: 600;
-            font-size: 1.1rem;
-            box-shadow: 0 2px 10px rgba(40, 167, 69, 0.3);
-            white-space: nowrap;
-        }
-
-        .status-badge {
-            position: absolute;
-            top: 1rem;
-            right: 1rem;
-            padding: 0.3rem 0.8rem;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .status-badge.upcoming {
-            background: rgba(40, 167, 69, 0.1);
-            color: #28a745;
-            border: 1px solid rgba(40, 167, 69, 0.2);
-        }
-        .status-badge.today {
-            background: rgba(255, 193, 7, 0.1);
-            color: #ffc107;
-            border: 1px solid rgba(255, 193, 7, 0.2);
-        }
-        .status-badge.past {
-            background: rgba(108, 117, 125, 0.1);
-            color: #6c757d;
-            border: 1px solid rgba(108, 117, 125, 0.2);
-        }
-
-        .view-toggle {
-            background: white;
-            border: 2px solid #007bff;
-            border-radius: 10px;
-            overflow: hidden;
-        }
-
-        .view-toggle .btn {
-            border: none;
-            border-radius: 0;
-            background: transparent;
-            color: #007bff;
-            transition: all 0.3s ease;
-        }
-
-        .view-toggle .btn.active {
-            background: #007bff;
-            color: white;
-        }
-
-        .view-toggle .btn:hover {
-            background: rgba(0, 123, 255, 0.1);
-        }
-
-        .view-toggle .btn.active:hover {
-            background: #0056b3;
-        }
-
-        @media (max-width: 768px) {
-            .event-list-item {
-                flex-direction: column;
-                text-align: center;
-            }
-            
-            .event-date-circle {
-                width: 60px;
-                height: 60px;
-                margin-bottom: 1rem;
-            }
-            
-            .event-date-day {
-                font-size: 1.4rem;
-            }
-            
-            .status-badge {
-                position: static;
-                margin-bottom: 1rem;
-            }
-        }
-
-        /* Character Counter Styles */
-        #charCounter {
-            font-size: 0.875rem;
-            font-weight: 500;
-            transition: color 0.3s ease;
-        }
-        
-        #charCounter.text-warning {
-            color: #fd7e14 !important;
-            font-weight: 600;
-        }
-        
-        #charCounter.text-muted {
-            color: #6c757d !important;
-        }
-    </style>
-</head>
 <body class="d-flex flex-column min-vh-100">
     <!-- Navigation -->
     <?php include 'inc/navbar.php'; ?>
@@ -768,5 +499,9 @@ $result = $conn->query($query);
             updateCharCounter();
         });
     </script>
+
+<?php
+$content = ob_get_clean();
+include 'template/base.html';
+?>
 </body>
-</html>

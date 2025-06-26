@@ -8,9 +8,12 @@
     <link rel="stylesheet" href="css/bootstrap.min.css" />
     <link rel="stylesheet" href="css/bootstrap-icons.min.css" />
     <link rel="stylesheet" href="css/style.css" />
+    <?php if (!empty($page_css)): ?>
+    <link rel="stylesheet" href="<?= $page_css ?>">
+    <?php endif; ?>
     <script defer src="js/bootstrap.bundle.min.js"></script>
 </head>
-<body>
+<body<?= isset($body_class) ? ' class="' . $body_class . '"' : '' ?>>
     <!-- Navbar -->
     <?php include 'inc/navbar.php'; ?>
 
