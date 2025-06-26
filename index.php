@@ -24,7 +24,6 @@ $total_revenue = $revenue_result->fetch_assoc()['revenue'] ?? 0;
 ob_start();
 ?>
 
-
 <div class="container">
     <section class="hero-section">
         <div class="hero-content loading-animation">

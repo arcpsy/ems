@@ -367,7 +367,7 @@ $result = $conn->query($query);
 <body class="d-flex flex-column min-vh-100">
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <div class="container">
+        <div class="container-sm">
             <a class="navbar-brand" href="index.php">
                 <i class="bi bi-collection"></i> GalaGo Events
             </a>
@@ -391,7 +391,7 @@ $result = $conn->query($query);
         </div>
     </nav>
 
-    <div class="container mt-4 flex-grow-1">
+    <div class="container-sm mt-4 flex-grow-1">
         <!-- Success/Error Messages -->
         <?php if (isset($_SESSION['success'])): ?>
             <div class="alert alert-success alert-dismissible fade show" role="alert">
