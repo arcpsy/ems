@@ -1,38 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo isset($page_title) ? $page_title : 'Events Monitoring System'; ?></title>
-    <link rel="stylesheet" href="css/bootstrap.min.css">
-    <link rel="stylesheet" href="css/bootstrap-icons.min.css"> 
-    <link rel="stylesheet" href="css/style.css">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title><?php echo isset($page_title) ? htmlspecialchars($page_title) : 'Events Monitoring System'; ?></title>
+
+    <link rel="stylesheet" href="css/bootstrap.min.css" />
+    <link rel="stylesheet" href="css/bootstrap-icons.min.css" />
+    <link rel="stylesheet" href="css/style.css" />
     <script defer src="js/bootstrap.bundle.min.js"></script>
 </head>
 <body>
+    <!-- Navbar -->
     <?php include 'includes/navbar.php'; ?>
 
+    <!-- Main content -->
     <main class="container-lg mt-4">
-        <?php if (isset($_SESSION['success'])): ?>
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                <i class="bi bi-check-circle"></i> <?php echo $_SESSION['success']; unset($_SESSION['success']); ?>
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        <?php endif; ?>
+        <?php include 'includes/flash-messages.php'; ?>
 
-        <?php if (isset($_SESSION['error'])): ?>
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <i class="bi bi-exclamation-triangle"></i> <?php echo $_SESSION['error']; unset($_SESSION['error']); ?>
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        <?php endif; ?>
-
+        <!-- Page-specific content -->
         <?php echo $content ?? ''; ?>
     </main>
 
+    <!-- Footer -->
     <footer class="bg-light mt-5 py-4">
         <div class="container text-center">
-            <p class="text-muted mb-0">&copy; GalaGo Events Monitoring System. All rights reserved.</p>
+            <p class="text-muted mb-0">&copy; <?php echo date('Y'); ?> GalaGo Events Monitoring System. All rights reserved.</p>
         </div>
     </footer>
 
