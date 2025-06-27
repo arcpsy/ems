@@ -232,6 +232,7 @@ body::before {
 
 .form-group {
     margin-bottom: 1.5rem;
+    position: relative;
 }
 
 .form-label {
@@ -265,6 +266,48 @@ body::before {
     color: var(--white);
     transform: translateY(-2px);
     outline: none;
+}
+
+.password-field {
+    position: relative;
+}
+
+.password-field .form-control {
+    padding-right: 3.5rem;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 1.1rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 8px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+}
+
+.password-toggle:hover {
+    color: var(--white);
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-50%) scale(1.1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.password-toggle:active {
+    transform: translateY(-50%) scale(0.95);
+}
+
+.password-toggle i {
+    transition: all 0.3s ease;
 }
 
 .btn {
@@ -434,8 +477,13 @@ body::before {
             <label class="form-label" for="password">
                 <i class="bi bi-lock me-1"></i>Password
             </label>
-            <input type="password" class="form-control" id="password" name="password" 
-                   placeholder="Create a strong password" required>
+            <div class="password-field">
+                <input type="password" class="form-control" id="password" name="password" 
+                       placeholder="Create a strong password" required>
+                <button type="button" class="password-toggle" onclick="togglePassword('password')">
+                    <i class="bi bi-eye" id="password_icon"></i>
+                </button>
+            </div>
             <small class="text-white-50">Password must be at least 8 characters long</small>
         </div>
 
@@ -443,8 +491,13 @@ body::before {
             <label class="form-label" for="confirm_password">
                 <i class="bi bi-lock-fill me-1"></i>Confirm Password
             </label>
-            <input type="password" class="form-control" id="confirm_password" name="confirm_password" 
-                   placeholder="Confirm your password" required>
+            <div class="password-field">
+                <input type="password" class="form-control" id="confirm_password" name="confirm_password" 
+                       placeholder="Confirm your password" required>
+                <button type="button" class="password-toggle" onclick="togglePassword('confirm_password')">
+                    <i class="bi bi-eye" id="confirm_password_icon"></i>
+                </button>
+            </div>
         </div>
 
         <button type="submit" name="register" class="btn btn-info">
@@ -461,6 +514,21 @@ body::before {
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 <script>
+function togglePassword(fieldId) {
+    const passwordField = document.getElementById(fieldId);
+    const toggleIcon = document.getElementById(fieldId + '_icon');
+    
+    if (passwordField.type === 'password') {
+        passwordField.type = 'text';
+        toggleIcon.classList.remove('bi-eye');
+        toggleIcon.classList.add('bi-eye-slash');
+    } else {
+        passwordField.type = 'password';
+        toggleIcon.classList.remove('bi-eye-slash');
+        toggleIcon.classList.add('bi-eye');
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     const form = document.querySelector('form');
     const password = document.getElementById('password');
