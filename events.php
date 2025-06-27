@@ -1,6 +1,10 @@
 <?php
 session_start();
 require_once 'config.php';
+require_once 'auth_functions.php';
+
+// Require login to access the system
+requireLogin();
 
 $page_title = "Events Management - GalaGo";
 
@@ -82,9 +86,6 @@ $result = $conn->query($query);
 <link href="css/style.css" rel="stylesheet">
 <title><?php echo $page_title; ?></title>
 <style>
-/* 🎨 STUNNING PURPLE-THEMED UI */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
-
 :root {
     --purple-primary: #8B5CF6;
     --purple-light: #A78BFA;
@@ -978,7 +979,7 @@ footer p {
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg">
         <div class="container">
-            <a class="navbar-brand" href="index.php">
+            <a class="navbar-brand" href="dashboard.php">
                 <i class="bi bi-gem me-2"></i>GalaGo Events
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -987,7 +988,7 @@ footer p {
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="index.php">
+                        <a class="nav-link" href="dashboard.php">
                             <i class="bi bi-house-door me-1"></i>Home
                         </a>
                     </li>

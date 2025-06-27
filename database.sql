@@ -1,12 +1,46 @@
-/*CREATE DATABASE IF NOT EXISTS events_monitoring;
+CREATE DATABASE IF NOT EXISTS events_monitoring;
 USE events_monitoring;
 
-CREATE TABLE events (
+CREATE TABLE IF NOT EXISTS events (
     id INT AUTO_INCREMENT PRIMARY KEY,
     event_name VARCHAR(255) NOT NULL,
     event_location VARCHAR(255) NOT NULL,
     event_date DATE NOT NULL,
     event_remarks TEXT,
     pricing DECIMAL(10,2) NOT NULL,
-    date_added TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);*/
+    date_added TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    user_id INT DEFAULT NULL
+);
+
+CREATE TABLE IF NOT EXISTS users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    first_name VARCHAR(50) NOT NULL,
+    last_name VARCHAR(50) NOT NULL,
+    is_verified BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS user_sessions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    session_token VARCHAR(255) NOT NULL,
+    expires_at DATETIME NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS email_verifications (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    verification_type ENUM('registration', 'password_reset') NOT NULL,
+    token VARCHAR(100) NOT NULL,
+    expires_at DATETIME NOT NULL,
+    is_used BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+ALTER TABLE events ADD FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL;

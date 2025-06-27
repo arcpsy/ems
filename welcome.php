@@ -2,9 +2,9 @@
 session_start();
 require_once 'auth_functions.php';
 
-// If user is already logged in, redirect to dashboard
+// If user is already logged in, redirect to main app
 if (isLoggedIn()) {
-    header('Location: dashboard.php');
+    header('Location: index.php');
     exit();
 }
 

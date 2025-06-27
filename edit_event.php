@@ -1,6 +1,10 @@
 <?php
 session_start();
 require_once 'config.php';
+require_once 'auth_functions.php';
+
+// Require login to access the system
+requireLogin();
 
 if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
     $_SESSION['error'] = "Invalid event ID";
@@ -461,7 +465,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_event'])) {
 
     <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container">
-            <a class="navbar-brand" href="index.php">
+            <a class="navbar-brand" href="dashboard.php">
                 <i class="bi bi-collection"></i> GalaGo Events
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -470,7 +474,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_event'])) {
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="index.php">
+                        <a class="nav-link" href="dashboard.php">
                             <i class="bi bi-house"></i> Home
                         </a>
                     </li>
@@ -488,7 +492,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_event'])) {
         <div class="breadcrumb-enhanced animate-slide-in">
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="index.php">Home</a></li>
+                    <li class="breadcrumb-item"><a href="dashboard.php">Home</a></li>
                     <li class="breadcrumb-item"><a href="events.php">Events</a></li>
                     <li class="breadcrumb-item active">Edit Event</li>
                 </ol>
