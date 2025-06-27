@@ -25,7 +25,6 @@ $revenue_result = $conn->query($revenue_query);
 $total_revenue = $revenue_result->fetch_assoc()['total_revenue'] ?? 0;
 ?>
 
-<!-- edit this, place your name and section here -->
 <!-- Students: Dagatan, Tristan Kyle; Dobli, Ferdinand John; Laynes, Carlo Allan; Manuel, Meynard Roi; Niñora, Michael Andrei; Sintos, Tristan James -->
 <!DOCTYPE html>
 <html>
@@ -1484,6 +1483,138 @@ footer p {
 <script src="js/script.js"></script>
 
 <script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize all glamorous effects
+    createGlamorousParticles();
+    createPulsingBackground();
+    createAdvancedScrollAnimations();
+    createMagneticEffect();
+    createTextShimmer();
+    
+    // Staggered animation for all elements
+    const animateElements = document.querySelectorAll('.animate-fade-in, .animate-slide-up, .dashboard-card, .feature-card, .hero-stat');
+    animateElements.forEach((element, index) => {
+        element.style.opacity = '0';
+        element.style.transform = 'translateY(50px)';
+        element.style.transition = 'all 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
+        
+        setTimeout(() => {
+            element.style.opacity = '1';
+            element.style.transform = 'translateY(0)';
+        }, index * 150);
+    });
+
+    // Animated counter for stats
+    const counters = document.querySelectorAll('.stat-number');
+    const observerOptions = {
+        threshold: 0.7
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                animateCounter(entry.target);
+                observer.unobserve(entry.target);
+            }
+        });
+    }, observerOptions);
+
+    counters.forEach(counter => {
+        observer.observe(counter);
+    });
+
+    function animateCounter(element) {
+        const target = parseInt(element.dataset.target || element.textContent.replace(/[₱,]/g, ''));
+        if (target && target > 0 && target < 10000) {
+            let current = 0;
+            const increment = target / 60;
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= target) {
+                    element.textContent = element.textContent.includes('₱') 
+                        ? `₱${target.toLocaleString()}` 
+                        : target.toLocaleString();
+                    clearInterval(timer);
+                } else {
+                    const displayValue = Math.floor(current);
+                    element.textContent = element.textContent.includes('₱') 
+                        ? `₱${displayValue.toLocaleString()}` 
+                        : displayValue.toLocaleString();
+                }
+            }, 16);
+        }
+    }
+
+    // Enhanced hover effects with advanced particles
+    document.querySelectorAll('.dashboard-card, .feature-card, .hero-stat').forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.filter = 'brightness(1.15) saturate(1.2)';
+            createAdvancedParticleEffect(this);
+        });
+
+        card.addEventListener('mouseleave', function() {
+            this.style.filter = 'brightness(1) saturate(1)';
+        });
+    });
+
+    // Button ripple effects
+    document.querySelectorAll('.btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            createRippleEffect(this, e);
+        });
+    });
+
+    // Smooth scrolling for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+
+    // Auto-dismiss alerts with fade effect
+    document.querySelectorAll('.alert').forEach(alert => {
+        setTimeout(() => {
+            if (alert && alert.classList.contains('show')) {
+                alert.style.opacity = '0';
+                alert.style.transform = 'translateX(100%)';
+                setTimeout(() => {
+                    if (alert.parentElement) {
+                        alert.remove();
+                    }
+                }, 300);
+            }
+        }, 5000);
+    });
+
+    // Navbar scroll effect
+    let lastScrollTop = 0;
+    const navbar = document.querySelector('.navbar');
+    
+    window.addEventListener('scroll', function() {
+        let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        
+        if (scrollTop > lastScrollTop) {
+            navbar.style.transform = 'translateY(-100%)';
+        } else {
+            navbar.style.transform = 'translateY(0)';
+        }
+        
+        if (scrollTop > 100) {
+            navbar.style.background = 'rgba(255, 255, 255, 0.25)';
+            navbar.style.boxShadow = '0 8px 32px rgba(139, 92, 246, 0.2)';
+        }
+        
+        lastScrollTop = scrollTop;
+    });
+});
+
 // Enhanced particle effects and glamorous animations
 function createGlamorousParticles() {
     const colors = ['#8B5CF6', '#EC4899', '#10B981', '#F59E0B', '#3B82F6', '#EF4444'];
@@ -1699,170 +1830,6 @@ function createTextShimmer() {
     });
 }
 
-// Add shimmer animation
-const shimmerStyle = document.createElement('style');
-shimmerStyle.textContent = `
-    @keyframes shimmerText {
-        0% { background-position: -200% 0; }
-        100% { background-position: 200% 0; }
-    }
-    
-    @keyframes floatingElements {
-        0%, 100% { transform: translateY(0px) rotate(0deg); }
-        50% { transform: translateY(-20px) rotate(5deg); }
-    }
-    
-    .feature-card:nth-child(odd) {
-        animation: floatingElements 6s ease-in-out infinite;
-        animation-delay: 0s;
-    }
-    
-    .feature-card:nth-child(even) {
-        animation: floatingElements 6s ease-in-out infinite;
-        animation-delay: -3s;
-    }
-`;
-document.head.appendChild(shimmerStyle);
-    
-    // Staggered animation for all elements
-    const animateElements = document.querySelectorAll('.animate-fade-in, .animate-slide-up, .dashboard-card, .feature-card, .hero-stat');
-    animateElements.forEach((element, index) => {
-        element.style.opacity = '0';
-        element.style.transform = 'translateY(50px)';
-        element.style.transition = 'all 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
-        
-        setTimeout(() => {
-            element.style.opacity = '1';
-            element.style.transform = 'translateY(0)';
-        }, index * 150);
-    });
-
-    // Animated counter for stats
-    const counters = document.querySelectorAll('.stat-number');
-    const observerOptions = {
-        threshold: 0.7
-    };
-
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                animateCounter(entry.target);
-                observer.unobserve(entry.target);
-            }
-        });
-    }, observerOptions);
-
-    counters.forEach(counter => {
-        observer.observe(counter);
-    });
-
-    function animateCounter(element) {
-        const target = parseInt(element.dataset.target || element.textContent.replace(/[₱,]/g, ''));
-        if (target && target > 0 && target < 10000) {
-            let current = 0;
-            const increment = target / 60;
-            const timer = setInterval(() => {
-                current += increment;
-                if (current >= target) {
-                    element.textContent = element.textContent.includes('₱') 
-                        ? `₱${target.toLocaleString()}` 
-                        : target.toLocaleString();
-                    clearInterval(timer);
-                } else {
-                    const displayValue = Math.floor(current);
-                    element.textContent = element.textContent.includes('₱') 
-                        ? `₱${displayValue.toLocaleString()}` 
-                        : displayValue.toLocaleString();
-                }
-            }, 16);
-        }
-    }
-
-    // Enhanced hover effects with advanced particles
-    document.querySelectorAll('.dashboard-card, .feature-card, .hero-stat').forEach(card => {
-        card.addEventListener('mouseenter', function() {
-            this.style.filter = 'brightness(1.15) saturate(1.2)';
-            createAdvancedParticleEffect(this);
-        });
-
-        card.addEventListener('mouseleave', function() {
-            this.style.filter = 'brightness(1) saturate(1)';
-        });
-    });
-
-    // Button ripple effects
-    document.querySelectorAll('.btn').forEach(btn => {
-        btn.addEventListener('click', function(e) {
-            createRippleEffect(this, e);
-        });
-    });
-
-    // Smooth scrolling for anchor links
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
-            e.preventDefault();
-            const target = document.querySelector(this.getAttribute('href'));
-            if (target) {
-                target.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
-                });
-            }
-        });
-    });
-
-    // Auto-dismiss alerts with fade effect
-    document.querySelectorAll('.alert').forEach(alert => {
-        setTimeout(() => {
-            if (alert && alert.classList.contains('show')) {
-                alert.style.opacity = '0';
-                alert.style.transform = 'translateX(100%)';
-                setTimeout(() => {
-                    if (alert.parentElement) {
-                        alert.remove();
-                    }
-                }, 300);
-            }
-        }, 5000);
-    });
-
-    // Navbar scroll effect
-    let lastScrollTop = 0;
-    const navbar = document.querySelector('.navbar');
-    
-    window.addEventListener('scroll', function() {
-        let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-        
-        if (scrollTop > lastScrollTop) {
-            navbar.style.transform = 'translateY(-100%)';
-        } else {
-            navbar.style.transform = 'translateY(0)';
-        }
-        
-        if (scrollTop > 100) {
-            navbar.style.background = 'rgba(255, 255, 255, 0.25)';
-            navbar.style.boxShadow = '0 8px 32px rgba(139, 92, 246, 0.2)';
-        } else {
-            navbar.style.background = 'rgba(255, 255, 255, 0.15)';
-            navbar.style.boxShadow = '0 8px 32px rgba(139, 92, 246, 0.1)';
-        }
-        
-        lastScrollTop = scrollTop;
-    });
-});
-
-// Create floating particles effect
-function createFloatingParticles() {
-    // This function is replaced by createGlamorousParticles for better effects
-    createGlamorousParticles();
-}
-
-// Create particle effect on hover  
-function createParticleEffect(element) {
-    // This function is replaced by createAdvancedParticleEffect for better effects
-    createAdvancedParticleEffect(element);
-}
-
 // Create ripple effect
 function createRippleEffect(element, event) {
     const ripple = document.createElement('span');
@@ -1896,17 +1863,37 @@ function createRippleEffect(element, event) {
     }, 600);
 }
 
-// Add ripple keyframes
-const style = document.createElement('style');
-style.textContent = `
+// Add shimmer and ripple animations
+const shimmerStyle = document.createElement('style');
+shimmerStyle.textContent = `
+    @keyframes shimmerText {
+        0% { background-position: -200% 0; }
+        100% { background-position: 200% 0; }
+    }
+    
+    @keyframes floatingElements {
+        0%, 100% { transform: translateY(0px) rotate(0deg); }
+        50% { transform: translateY(-20px) rotate(5deg); }
+    }
+    
     @keyframes ripple {
         to {
             transform: scale(4);
             opacity: 0;
         }
     }
+    
+    .feature-card:nth-child(odd) {
+        animation: floatingElements 6s ease-in-out infinite;
+        animation-delay: 0s;
+    }
+    
+    .feature-card:nth-child(even) {
+        animation: floatingElements 6s ease-in-out infinite;
+        animation-delay: -3s;
+    }
 `;
-document.head.appendChild(style);
+document.head.appendChild(shimmerStyle);
 </script>
 
 </body>
