@@ -50,35 +50,55 @@ RECOMMENDED SETUP:
 INSTALLATION INSTRUCTIONS
 ================================================================================
 
-1. SETUP DATABASE:
+1. FILE DEPLOYMENT:
+   • Copy all project files to your web server directory (htdocs for XAMPP)
+   • Ensure proper folder structure is maintained:
+     /events_monitoring/
+      ├── css/
+      │   └── style.css
+      ├── js/
+      │   └── script.js
+      ├── templates/
+      │   └── base.html
+      ├── auth_functions.php
+      ├── config.php
+      ├── dashboard.php
+      ├── database.sql
+      ├── edit_event.php
+      ├── events.php
+      ├── forgot_password.php
+      ├── index.php
+      ├── login.php
+      ├── logout.php
+      ├── readme.txt
+      ├── register.php
+      └── welcome.php
+
+2. PERMISSIONS:
+   • Ensure web server has read/write permissions to the project directory
+   • Set appropriate file permissions (644 for files, 755 for directories)
+
+3. SETUP DATABASE:
    • Start your MySQL server
    • Import the 'database.sql' file to create the database and tables
    • Update database credentials in 'config.php' if necessary
 
-2. FILE DEPLOYMENT:
-   • Copy all project files to your web server directory (htdocs for XAMPP)
-   • Ensure proper folder structure is maintained:
-     /events_monitoring/
-     ├── css/
-     │   └── style.css
-     ├── js/
-     │   └── script.js
-     ├── templates/
-     │   └── base.html
-     │   └── events.php
-     ├── config.php
-     ├── index.php
-     ├── events.php
-     ├── edit_event.php
-     ├── database.sql
-     └── readme.txt
 
-3. PERMISSIONS:
-   • Ensure web server has read/write permissions to the project directory
-   • Set appropriate file permissions (644 for files, 755 for directories)
+4. RUNNING THE APPLICATION
 
-4. TESTING:
-   • Navigate to http://localhost/index.php/ in your browser
+   Option 1: Using PHP Built-In Server
+   • Open terminal, navigate the project folder.
+   • Run the command: 𝐩𝐡𝐩 -𝐒 𝐥𝐨𝐜𝐚𝐥𝐡𝐨𝐬𝐭:𝟖𝟎𝟎𝟎
+   • In your browser, go to: http://𝐥𝐨𝐜𝐚𝐥𝐡𝐨𝐬𝐭:𝟖𝟎𝟎𝟎
+
+   Option 2: XAMPP setup
+   • Open the XAMPP Control Panel and start Apache & MySQL
+   • In your browser, go to: 𝐡𝐭𝐭𝐩://𝐥𝐨𝐜𝐚𝐥𝐡𝐨𝐬𝐭/<𝐩𝐫𝐨𝐣𝐞𝐜𝐭𝐟𝐨𝐥𝐝𝐞𝐫𝐧𝐚𝐦𝐞>/𝐥𝐨𝐠𝐢𝐧.𝐩𝐡𝐩
+   • GalaGo has a login feature, if it's your first time visiting the page. Kindly register and create an account first.
+
+
+5. TESTING:
+   • Navigate to http://localhost/login.php/ in your browser
    • Verify database connection and basic functionality
 
 ================================================================================
@@ -87,7 +107,7 @@ HOW TO USE THE SYSTEM
 
 1. ACCESSING THE SYSTEM:
    • Open your web browser
-   • Navigate to the system URL (http://localhost/index.php/)
+   • Navigate to the system URL (http://localhost/login.php/)
    • The homepage displays system overview and quick stats
 
 2. VIEWING EVENTS:
@@ -227,7 +247,6 @@ FUTURE ENHANCEMENTS
 ================================================================================
 
 POTENTIAL IMPROVEMENTS:
-• User authentication and authorization system
 • Email notifications for upcoming events
 • Calendar integration and event reminders
 • File upload capability for event attachments
@@ -275,6 +294,6 @@ PROJECT COMPLETION CHECKLIST
 END OF DOCUMENTATION
 ================================================================================
 
-Last Updated: June 25, 2025
+Last Updated: June 28, 2025
 System Version: 1.0
 Documentation Version: 1.0
