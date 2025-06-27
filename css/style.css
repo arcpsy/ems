@@ -1143,8 +1143,6 @@ main {
   animation-delay: 0.2s;
 }
 
-
-
 .btn:disabled {
    opacity: 0.6;
    transform: none !important;
