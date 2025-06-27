@@ -21,15 +21,13 @@ $revenue_query = "SELECT SUM(pricing) as revenue FROM events";
 $revenue_result = $conn->query($revenue_query);
 $total_revenue = $revenue_result->fetch_assoc()['revenue'] ?? 0;
 
+
 ob_start();
 ?>
 
 <div class="container">
     <?php include 'inc/home/hero-section.php'; ?>
-    <div class="row align-items-stretch">
-        <?php include 'inc/home/system-overview-card.php'; ?>
-        <?php include 'inc/home/upcoming-events-card.php'; ?>
-    </div>
+    <?php include 'inc/home/upcoming-events-card.php'; ?>
     <?php include 'inc/home/features-grid.php'; ?>
     <?php include 'inc/home/dev-team-section.php'; ?>
     <?php include 'inc/home/get-started-cta.php'; ?>

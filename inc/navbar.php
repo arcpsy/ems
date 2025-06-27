@@ -1,5 +1,5 @@
 <nav class="navbar navbar-expand-lg navbar-dark gala-navbar">
-  <div class="container-sm">
+  <div class="container">
     <!-- Logo / Brand -->
     <a class="navbar-brand" href="index.php">
       <i class="bi bi-clipboard2-check-fill me-2"></i> GalaGo Events

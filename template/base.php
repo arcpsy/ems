@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
     <title><?php echo isset($page_title) ? htmlspecialchars($page_title) : 'Events Monitoring System'; ?></title>
 
     <link rel="stylesheet" href="css/bootstrap.min.css" />
@@ -26,11 +26,14 @@
     </main>
 
     <!-- Footer -->
-    <footer class="bg-light mt-5 py-4">
-        <div class="container text-center">
-            <p class="text-muted mb-0">&copy; <?php echo date('Y'); ?> GalaGo Events Monitoring System. All rights reserved.</p>
-        </div>
+    <footer class="footer-glass mt-5 py-4">
+    <div class="container text-center">
+        <p class="footer-text mb-0">
+        &copy; <?php echo date('Y'); ?> <strong>GalaGo</strong> Events Monitoring System. All rights reserved.
+        </p>
+    </div>
     </footer>
+
 
     <script src="js/script.js"></script>
     <?php if (!empty($page_js)): ?>
