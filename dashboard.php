@@ -214,7 +214,6 @@ body::before {
 .hero-section {
     padding: 4rem 0;
     position: relative;
-    overflow: hidden;
 }
 
 .hero-content {
